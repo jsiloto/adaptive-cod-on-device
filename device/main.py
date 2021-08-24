@@ -1,10 +1,9 @@
 import requests
-
+import torch
 import numpy as np
 from PIL import Image
-import torchvision.transforms.functional as TF
-import bitstream
-from bitstream import BitStream
+import torchvision.transforms.functional as tfunc
+from torchvision import transforms
 
 from functools import reduce  # Required in Python 3
 import operator
@@ -15,19 +14,31 @@ def prod(iterable):
 image_path = './resource/000000000161.jpg'
 
 image = Image.open(image_path)
-x = TF.to_tensor(image)
-x.unsqueeze(0)
-print(x.shape)
-
-x = x.numpy().astype(np.int8)
+print(image)
+x = tfunc.to_tensor(image)
+x = (x*255).numpy().astype(np.int8)
 print(prod(x.shape))
 print(len(x.tostring())/4)
+# print(x.shape)
+# im = transforms.ToPILImage()(x).convert("RGB")
+# print(im)
+#
+#
+#
+#
+#
+# exit()
+# print(image.shape)
+# x = tfunc.to_tensor(image)
+# x.unsqueeze(0)
+# print(x.shape)
+
 
 #
 #
 
 #
-res = requests.post(url='http://0.0.0.0:5000/png',
+res = requests.post(url='http://0.0.0.0:5000/compute',
                     data=x.tostring(),
                     headers={'Content-Type': 'application/octet-stream'})
 
