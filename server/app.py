@@ -4,8 +4,10 @@ import numpy as np
 from flask import Flask, render_template, request, send_file
 # from model import get_model
 import torchvision.transforms as transforms
+import time
 
-
+import torch
+from PIL import Image
 import sys
 sys.path.insert(0,'./yolov5')
 from utils.general import non_max_suppression
@@ -15,79 +17,101 @@ from utils.torch_utils import copy_attr
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 app.config['UPLOAD_FOLDER'] = os.path.abspath("./photo/")
-jpg_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'shovon.jpg')
-results_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'shovon_result.png')
+endpoint_filename = os.path.join(app.config['UPLOAD_FOLDER'], '<filename>')
+input_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'image.png')
+output_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'output.png')
+reference_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'reference.png')
 
-import torch
-from PIL import Image
 
 # Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-print(model.stride)
-print(model.names)
-print(model.names[50])
+# print(model.stride)
+# print(model.names)
+# print(model.names[50])
 
 import yaml
 from yaml.loader import SafeLoader
 
-j = torch.jit.load('yolov5s.torchscript.pt')
-jitmodel = AutoShape(j)
-# print(j.__dict__)
-copy_attr(jitmodel, j, include=('yaml', 'nc', 'hyp', 'names', 'stride'), exclude=())  # copy attributes
-jitmodel.stride=torch.tensor([8., 16., 32.])
+reference_model = torch.jit.load('yolov5s.torchscript.pt')
+reference_model = AutoShape(reference_model)
+
+test_model = torch.jit.load('efficientdet.pt')
+test_model = AutoShape(test_model)
+
+elapsed_test = 0
+elapsed_reference = 0
+
+test_model.stride=torch.tensor([8., 16., 32.])
 with open('./yolov5/data/coco.yaml', 'r') as f:
-    jitmodel.names = yaml.load(f)['names']
+    test_model.names = yaml.load(f)['names']
 
+reference_model.stride=torch.tensor([8., 16., 32.])
+with open('./yolov5/data/coco.yaml', 'r') as f:
+    reference_model.names = yaml.load(f)['names']
 
-
-def yolo(im, size=640):
+def detect(im, model, size=640):
     im = transforms.ToPILImage()(im).convert("RGB")
-    # g = (size / max(im.size))  # gain
     im = im.resize((size, size), Image.ANTIALIAS)  # resize
-    results = jitmodel(im)  # inference
+    start = time.time()
+    for i in range(5):
+        results = model(im)  # inference
+
+    end = time.time()
+    elapsed = (end-start)/5
+
     results.render()  # updates results.imgs with boxes and labels
-    return Image.fromarray(results.imgs[0])
-
-def yoloscript(im, size=640):
-    im = transforms.Resize((size, size))(im)
-    print(im.shape)
-    # print(im)
-    results = jitmodel(im)  # inference
-
-    print("################################################")
-    # print(results)
-    print("################################################")
-    return results
-
+    return Image.fromarray(results.imgs[0]), elapsed
 
 @app.route('/')
 def show_index():
-    return render_template("index.html", jpg_image=jpg_filename, results_image=results_filename)
+    return render_template("index.html",
+                           input_image=input_filename,
+                           output_image=output_filename,
+                           reference_image=reference_filename)
 
-@app.route(jpg_filename)
-def jpg_image():
-    return send_file(jpg_filename, mimetype='image/jpg')
+@app.route(endpoint_filename)
+def image(filename=None):
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    return send_file(filename, mimetype='image/png')
 
-@app.route(results_filename)
-def png_image():
-    return send_file(results_filename, mimetype='image/png')
+# @app.route('/image', methods=['POST'])
+# def image():
+#     data = np.fromstring(request.data, dtype=np.uint8).reshape([3, 640, 640])
+#     print(data)
+#     # data = data.astype(np.float32)/255.0
+#     data = np.swapaxes(data, 0, 2)
+#     data = np.swapaxes(data, 0, 1)
+#     print(data.shape)
+#     im = Image.fromarray(data)
+#     im.save(input_filename)
+#     # with open(jpg_filename, 'wb+') as f:
+#     #     f.write(request.data)
+#
+#     os.chmod(input_filename, 0o777)
+#     # full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'shovon.jpg')
+#     return "Welcome to Flask!"
 
-@app.route('/jpg', methods=['POST'])
-def jpg():
-    with open(jpg_filename, 'wb+') as f:
-        f.write(request.data)
-
-    os.chmod(jpg_filename, 0o777)
-    # full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'shovon.jpg')
-    return "Welcome to Flask!"
+def save_tensor_image(data):
+    data = np.swapaxes(data, 0, 2)
+    data = np.swapaxes(data, 0, 1)
+    print(data.shape)
+    image = Image.fromarray(data)
+    image.save(input_filename)
 
 @app.route('/compute', methods=['POST'])
 def compute():
     from PIL import Image
-    data = np.fromstring(request.data, dtype=np.int8).reshape([3, 480, 640])
-    print(data.shape)
+    data = np.fromstring(request.data, dtype=np.uint8).reshape([3, 640, 640])
+    save_tensor_image(data)
     x = torch.tensor(data.astype(np.float32)/255)
-    im = yolo(x)
-    im.save(results_filename)
-    os.chmod(results_filename, 0o777)
+
+    output, elapsed_test = detect(x, test_model)
+    output.save(output_filename)
+    os.chmod(output_filename, 0o777)
+
+    reference, elapsed_reference = detect(x, reference_model)
+    reference.save(reference_filename)
+    os.chmod(reference_filename, 0o777)
+
+
     return "OK"

@@ -11,43 +11,32 @@ def prod(iterable):
     return reduce(operator.mul, iterable, 1)
 
 
-image_path = './resource/000000000161.jpg'
+# image_path = './resource/000000000161.jpg'
+# image_path = "./resource/000000112378.jpg"
+# image_path = "./resource/000000000109.jpg"
+image_path = './resource/img_test.png'
+
+import os, random
+image_path = random.choice(os.listdir("../resource/dataset/coco2017/val2017")) #change dir name to whatever
+image_path = os.path.join("../resource/dataset/coco2017/val2017/", image_path)
+print(image_path)
+
 
 image = Image.open(image_path)
+image = image.resize((640, 640))
 print(image)
 x = tfunc.to_tensor(image)
-x = (x*255).numpy().astype(np.int8)
+x = (x*255).numpy().astype(np.uint8)
+print(x)
 print(prod(x.shape))
-print(len(x.tostring())/4)
-# print(x.shape)
-# im = transforms.ToPILImage()(x).convert("RGB")
-# print(im)
-#
-#
-#
-#
-#
-# exit()
-# print(image.shape)
-# x = tfunc.to_tensor(image)
-# x.unsqueeze(0)
-# print(x.shape)
+print(len(x.tobytes()))
 
-
-#
-#
 
 #
 res = requests.post(url='http://0.0.0.0:5000/compute',
-                    data=x.tostring(),
+                    data=x.tobytes(),
                     headers={'Content-Type': 'application/octet-stream'})
 
-
-with open('./resource/000000000161.jpg', 'rb') as f:
-    data = f.read()
-res = requests.post(url='http://0.0.0.0:5000/jpg',
-                    data=data,
-                    headers={'Content-Type': 'application/octet-stream'})
 
 # Build model
 # Load model from checkpoint
