@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Index</title>
+  <meta charset=utf-8 />
+  <title></title>
+  <style>
+    div.container {
+      display:inline-block;
+    }
+
+    p {
+      text-align:center;
+    }
+  </style>
 </head>
 <body>
-    <figure>
-        <img src='{{ input_image }}' alt='Input' width="360"/>
-        <figcaption>Caption goes here</figcaption>
-    </figure>
-
-    <figure>
-        <img src='{{ output_image }}' alt='Output' width="360"/>
-        <figcaption>Caption goes here</figcaption>
-    </figure>
-
+  <div class="container">
+    <img src="{{ input_image }}" height="360" width="360" />
+    <p>Input</p>
+  </div>
+ <div class="container">
+    <img class="middle-img" src="{{ output_image }}" height="360" width="360" />
+    <p>Output Timing: {{ output_time }}</p>
+  </div>
+  <div class="container">
+    <img src="{{ reference_image }}" height="360" width="360" />
+    <p>Reference Timing: {{ reference_time }}</p>
+  </div>
+</div>
 </body>
-
-<body>
-    <img src="{{ reference_image }}"  alt="Reference" width="360" >
-</body>
-    asdasdasdasd
-
 </html>

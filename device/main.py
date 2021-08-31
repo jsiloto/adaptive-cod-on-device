@@ -20,9 +20,15 @@ import os, random
 image_path = random.choice(os.listdir("../resource/dataset/coco2017/val2017")) #change dir name to whatever
 image_path = os.path.join("../resource/dataset/coco2017/val2017/", image_path)
 print(image_path)
+# image_path = "/workspace/resource/dataset/coco2017/val2017/000000534664.jpg"
 
 
 image = Image.open(image_path)
+
+red, green, blue = image.split()
+image = Image.merge('RGB', (red, green, blue))
+
+
 image = image.resize((640, 640))
 print(image)
 x = tfunc.to_tensor(image)
