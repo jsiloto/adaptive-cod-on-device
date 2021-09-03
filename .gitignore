@@ -1,8 +1,10 @@
 adaptive-cod/
 .idea/
 server/photo/
-
-
+*.pt
+*.ptl
+*.jpg
+*.png
 
 
 
