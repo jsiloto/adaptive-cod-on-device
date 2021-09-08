@@ -8,45 +8,36 @@ import numpy as np
 import requests
 import torchvision.transforms.functional as tfunc
 from PIL import Image
-
+from api import delete_results, get_results, compute_image
 
 def prod(iterable):
     return reduce(operator.mul, iterable, 1)
 
-
-# image_path = './resource/000000000161.jpg'
-# image_path = "./resource/000000112378.jpg"
-# image_path = "./resource/000000000109.jpg"
-image_path = './resource/img_test.png'
-
-num_images = 100
-for i in range(num_images):
-    start = time.time()
-    print("Sending image {} of {}".format(i, num_images))
-
+def get_random_image():
     image_id = random.choice(os.listdir("../resource/dataset/coco2017/val2017")) #change dir name to whatever
     image_path = os.path.join("../resource/dataset/coco2017/val2017/", image_id)
     print(image_path)
-    # image_path = "/workspace/resource/dataset/coco2017/val2017/000000534664.jpg"
-
     image = Image.open(image_path)
-    w = image.size[0]
-    h = image.size[1]
+    return image, image_id
 
 
-    print(image.size)
-    image = image.resize((640, 640))
-    x = tfunc.to_tensor(image)
-    x = (x*255).numpy().astype(np.uint8)
-    res = requests.post(url='http://0.0.0.0:5000/compute',
-                        data=x.tobytes(),
-                        headers={'Content-Type': 'application/octet-stream',
-                                 "image_id": image_id,
-                                 "w": str(w),
-                                 "h": str(h)})
-    end = time.time()
-    elapsed = (end-start)
-    print("Sample Processing Time: {}".format(elapsed))
+if __name__ == '__main__':
+    base_url = 'http://0.0.0.0:5000/'
+    delete_results(base_url)
+    num_images = 5
+    for i in range(num_images):
+        start = time.time()
+        print("Sending image {} of {}".format(i, num_images))
+        image, image_id = get_random_image()
+
+        compute_image(base_url, image, image_id)
+
+        end = time.time()
+        elapsed = (end-start)
+        print("Sample Processing Time: {}".format(elapsed))
+
+    result = get_results(base_url)
+    print(result.content)
 
 # Build model
 # Load model from checkpoint

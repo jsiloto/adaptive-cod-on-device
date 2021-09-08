@@ -3,7 +3,7 @@ import json
 import numpy as np
 import torch
 from PIL import Image
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, make_response
 from models import get_models, detect
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
@@ -19,6 +19,7 @@ endpoint_filename = os.path.join(app.config['UPLOAD_FOLDER'], '<filename>')
 input_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'image.png')
 output_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'output.png')
 reference_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'reference.png')
+results_filename = "data.json"
 
 reference_model, test_model = get_models()
 
@@ -27,14 +28,31 @@ complete_results = []
 elapsed_test = 0
 elapsed_reference = 0
 
-try:
-    with open('data.json', ) as f:
-        complete_results = json.load(f)
-except:
-    pass
+@app.route('/results', methods=['DELETE'])
+def clean_result():
+    global complete_results
+    complete_results = []
+    # Handle errors while calling os.remove()
+    try:
+        os.remove(results_filename)
+    except:
+        print("Error while deleting file ", results_filename)
+    return "OK"
 
-print(complete_results)
+@app.route('/results', methods=['GET'])
+def get_result():
+    global complete_results
+    cocoDt = cocoGt.loadRes(results_filename)
+    cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
+    imgIds = [i['image_id'] for i in complete_results]
+    cocoEval.params.imgIds = imgIds
 
+    cocoEval.evaluate()
+    cocoEval.accumulate()
+    cocoEval.summarize()
+    return {
+        "stats": cocoEval.stats.tolist()
+    }
 
 @app.route('/')
 def show_index():
