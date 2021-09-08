@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TIMEOUT=10
+TIMEOUT=30
 gunicorn main:app \
           --bind 0.0.0.0:5000 \
           --reload -R \
