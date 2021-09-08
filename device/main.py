@@ -2,6 +2,7 @@ import operator
 import os
 import random
 from functools import reduce  # Required in Python 3
+import time
 
 import numpy as np
 import requests
@@ -18,8 +19,10 @@ def prod(iterable):
 # image_path = "./resource/000000000109.jpg"
 image_path = './resource/img_test.png'
 
-
-for i in range(10):
+num_images = 100
+for i in range(num_images):
+    start = time.time()
+    print("Sending image {} of {}".format(i, num_images))
 
     image_id = random.choice(os.listdir("../resource/dataset/coco2017/val2017")) #change dir name to whatever
     image_path = os.path.join("../resource/dataset/coco2017/val2017/", image_id)
@@ -41,7 +44,9 @@ for i in range(10):
                                  "image_id": image_id,
                                  "w": str(w),
                                  "h": str(h)})
-
+    end = time.time()
+    elapsed = (end-start)
+    print("Sample Processing Time: {}".format(elapsed))
 
 # Build model
 # Load model from checkpoint
