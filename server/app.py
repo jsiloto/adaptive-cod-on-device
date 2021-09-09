@@ -4,9 +4,14 @@ import numpy as np
 import torch
 from PIL import Image
 from flask import Flask, render_template, request, send_file, make_response
-from models import get_models, detect
+from models import get_models, detect, pred2det
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
+from yolov5.models.common import AutoShapeDecoder, AutoShapeEncoder, AutoShape
+from models import invert_afine
+import sys
+sys.path.insert(0, '../common')
+from tensor_utils import dequantize_tensor, QuantizedTensor
 
 annFile = '../resource/dataset/coco2017/annotations/instances_val2017.json'
 cocoGt = COCO(annFile)
@@ -28,6 +33,28 @@ complete_results = []
 elapsed_test = 0
 elapsed_reference = 0
 
+encoder = torch.jit.load('effd2_encoder.ptl')
+decoder = torch.jit.load('effd2_decoder.ptl')
+decoder = AutoShapeDecoder(decoder)
+
+decoder.stride = torch.tensor([8., 16., 32.])
+decoder.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
+                 'traffic light', 'fire hydrant', '', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
+                 'horse',
+                 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', '', 'backpack', 'umbrella', '', '', 'handbag',
+                 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
+                 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', '', 'wine glass', 'cup',
+                 'fork', 'knife',
+                 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
+                 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', '', 'dining table', '', '', 'toilet', '',
+                 'tv',
+                 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
+                 'refrigerator', '', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',
+                 'toothbrush']
+
+
+
+
 @app.route('/results', methods=['DELETE'])
 def clean_result():
     global complete_results
@@ -38,6 +65,7 @@ def clean_result():
     except:
         print("Error while deleting file ", results_filename)
     return "OK"
+
 
 @app.route('/results', methods=['GET'])
 def get_result():
@@ -53,6 +81,7 @@ def get_result():
     return {
         "stats": cocoEval.stats.tolist()
     }
+
 
 @app.route('/')
 def show_index():
@@ -110,17 +139,48 @@ def compute():
     output.save(output_filename)
     os.chmod(output_filename, 0o777)
 
-    reference, elapsed_reference, detections_ref = detect(x, reference_model, image_id, orig_w=w, orig_h=h, size=640)
-    print(str(elapsed_reference))
-    reference.save(reference_filename)
-    os.chmod(reference_filename, 0o777)
+    # reference, elapsed_reference, detections_ref = detect(x, reference_model, image_id, orig_w=w, orig_h=h, size=640)
+    # print(str(elapsed_reference))
+    # reference.save(reference_filename)
+    # os.chmod(reference_filename, 0o777)
 
     complete_results += detections
-    # print(complete_results)
     with open('data.json', 'w') as f:
         json.dump(complete_results, f)
 
     os.chmod('data.json', 0o777)
 
+    return "OK"
+
+
+@app.route('/split', methods=['POST'])
+def split():
+    global complete_results
+    print(len(request.data))
+    data = np.fromstring(request.data, dtype=np.uint8).reshape([1, 12, 80, 80])
+    # data = np.fromstring(request.data, dtype=np.uint8).reshape([1, 3, 640, 640])
+
+    image_id = request.headers['image_id']
+    print(image_id)
+    image_path = os.path.join("../resource/dataset/coco2017/val2017/", image_id)
+    image_id = int(image_id.split('.jpg')[0])
+    w = int(request.headers['w'])
+    h = int(request.headers['h'])
+    scale = float(request.headers['scale'])
+    zero_point = float(request.headers['zero_point'])
+
+    x = QuantizedTensor(tensor=torch.tensor(data), scale=scale, zero_point=zero_point)
+    # print(x)
+    x = dequantize_tensor(x)
+    results = decoder(x)
+
+    from yolov5.models.common import Detections
+    im = Image.open(image_path).resize((640, 640), Image.ANTIALIAS)
+    results.imgs = [np.asarray(im)]
+    results.render()
+    im = Image.fromarray(results.imgs[0])
+    im.save(reference_filename)
+
+    detections = pred2det(results.pred[0], image_id, w, h)
 
     return "OK"
