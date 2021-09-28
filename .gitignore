@@ -5,7 +5,7 @@ server/photo/
 *.ptl
 *.jpg
 *.png
-
+android-device/.gradle/
 
 
 # Byte-compiled / optimized / DLL files
