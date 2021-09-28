@@ -8,6 +8,7 @@ from models import get_models, detect, pred2det
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 from yolov5.models.common import AutoShapeDecoder, AutoShapeEncoder, AutoShape
+from postprocess import detection2response
 from models import invert_afine
 import sys
 sys.path.insert(0, '../common')
@@ -53,7 +54,11 @@ decoder.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 't
                  'toothbrush']
 
 
-
+@app.route('/test', methods=['post'])
+def test():
+    print(request.headers)
+    print(request.data)
+    return "OK"
 
 @app.route('/results', methods=['DELETE'])
 def clean_result():
@@ -87,17 +92,17 @@ def get_result():
 def show_index():
     global elapsed_test, elapsed_reference
 
+    try:
     # running evaluation
-    cocoDt = cocoGt.loadRes('data.json')
-    cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
-
-    imgIds = [i['image_id'] for i in complete_results]
-
-    cocoEval.params.imgIds = imgIds
-
-    cocoEval.evaluate()
-    cocoEval.accumulate()
-    cocoEval.summarize()
+        cocoDt = cocoGt.loadRes('data.json')
+        cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
+        imgIds = [i['image_id'] for i in complete_results]
+        cocoEval.params.imgIds = imgIds
+        cocoEval.evaluate()
+        cocoEval.accumulate()
+        cocoEval.summarize()
+    except:
+        pass
 
     return render_template("index.html",
                            input_image=input_filename,
@@ -145,12 +150,16 @@ def compute():
     # os.chmod(reference_filename, 0o777)
 
     complete_results += detections
+
     with open('data.json', 'w') as f:
         json.dump(complete_results, f)
 
     os.chmod('data.json', 0o777)
 
-    return "OK"
+    response = make_response(detection2response(detections), 200)
+    response.mimetype = "text/plain"
+
+    return response
 
 
 @app.route('/split', methods=['POST'])
@@ -183,4 +192,7 @@ def split():
 
     detections = pred2det(results.pred[0], image_id, w, h)
 
-    return "OK"
+    response = make_response(detection2response(detections), 200)
+    response.mimetype = "text/plain"
+
+    return response
