@@ -67,6 +67,7 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
         final String responseBody = response.body().string();
         JsonObject jsonObject =  JsonParser.parseString(responseBody).getAsJsonObject();
         JsonArray data = jsonObject.getAsJsonArray("data");
+        results.clear();
         for(JsonElement obj: data){
             Result r = parseJSONResult(obj.getAsJsonObject());
             System.out.println(r);
@@ -76,9 +77,15 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
     private Result parseJSONResult(JsonObject obj){
         int[] numbers = jsonParser.fromJson(obj.getAsJsonObject().get("bbox"), int[].class);
 
+        int x = numbers[0];
+        int y = numbers[1];
+        int w = numbers[2];
+        int h = numbers[3];
+
+
         return new Result(
-                obj.get("class").getAsInt(),
+                obj.get("class").getAsInt()-1,
                 obj.get("score").getAsFloat(),
-                new Rect(numbers[0], numbers[1], numbers[2], numbers[3]));
+                new Rect(x, y, x+w, y+h));
     }
 }

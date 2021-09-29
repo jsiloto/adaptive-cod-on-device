@@ -44,21 +44,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Headers;
-import okhttp3.MultipartBody;
-import okhttp3.Response;
-
-
+import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity implements Runnable {
     private int mImageIndex = 0;
-    private String[] mTestImages = {"000000133244.jpg", "test2.jpg", "test3.png"};
+    private String imageId = "000000031620.jpg";
 
     private ImageView mImageView;
     private ResultView mResultView;
@@ -112,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         setContentView(R.layout.activity_main);
 
         try {
-            mBitmap = BitmapFactory.decodeStream(getAssets().open(mTestImages[mImageIndex]));
+            mBitmap = BitmapFactory.decodeStream(getAssets().open("coco_images/"+imageId));
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);
             finish();
@@ -122,24 +113,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         mImageView.setImageBitmap(mBitmap);
         mResultView = findViewById(R.id.resultView);
         mResultView.setVisibility(View.INVISIBLE);
-
-        final Button buttonTest = findViewById(R.id.testButton);
-        buttonTest.setText(("Test Image 1/3"));
-        buttonTest.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mResultView.setVisibility(View.INVISIBLE);
-                mImageIndex = (mImageIndex + 1) % mTestImages.length;
-                buttonTest.setText(String.format("Text Image %d/%d", mImageIndex + 1, mTestImages.length));
-
-                try {
-                    mBitmap = BitmapFactory.decodeStream(getAssets().open(mTestImages[mImageIndex]));
-                    mImageView.setImageBitmap(mBitmap);
-                } catch (IOException e) {
-                    Log.e("Object Detection", "Error reading assets", e);
-                    finish();
-                }
-            }
-        });
 
 
         final Button buttonSelect = findViewById(R.id.selectButton);
@@ -267,24 +240,40 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         ApiHandler apiHandler = new ApiHandler();
 
-        QuantizedTensor qbitmap = new QuantizedTensor(resizedBitmap);
-        qbitmap.originalWidth = mBitmap.getWidth();
-        qbitmap.originalHeight = mBitmap.getHeight();
-        apiHandler.postImageTensor(qbitmap);
+//        QuantizedTensor qbitmap = new QuantizedTensor(resizedBitmap);
+//        qbitmap.originalWidth = mBitmap.getWidth();
+//        qbitmap.originalHeight = mBitmap.getHeight();
+//        try {
+//            apiHandler.postImageTensor(qbitmap);
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-        QuantizedTensor qx = new QuantizedTensor(outputTensor, 8);
+        QuantizedTensor qx = new QuantizedTensor(outputTensor, 8, imageId);
         qx.originalWidth = mBitmap.getWidth();
         qx.originalHeight = mBitmap.getHeight();
-        apiHandler.postSplitTensor(qx);
+        try {
+            apiHandler.postSplitTensor(qx);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 //        final float[] outputs = outputTensor.getDataAsFloatArray();
-//        final ArrayList<Result> results =  PrePostProcessor.outputsToNMSPredictions(outputs, mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY);
+        ResultScaler resultScaler = new ResultScaler(
+                mImgScaleX, mImgScaleY, mIvScaleX,
+                mIvScaleY, mStartX, mStartY);
 
+        final ArrayList<Result> results =  resultScaler.RescaleResults(apiHandler.lastResults);
+        System.out.println(results);
         runOnUiThread(() -> {
             mButtonDetect.setEnabled(true);
             mButtonDetect.setText(getString(R.string.detect));
             mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-//            mResultView.setResults(results);
+            mResultView.setResults(results);
             mResultView.invalidate();
             mResultView.setVisibility(View.VISIBLE);
         });

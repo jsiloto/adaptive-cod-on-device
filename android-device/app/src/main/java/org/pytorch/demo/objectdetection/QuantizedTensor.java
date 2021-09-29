@@ -10,6 +10,7 @@ public class QuantizedTensor {
     public byte [] qx;
     public int originalWidth = 0;
     public int originalHeight = 0;
+    public String imageId = "";
 
 
     public QuantizedTensor(Bitmap bitmap){
@@ -25,7 +26,8 @@ public class QuantizedTensor {
     }
 
 
-    public QuantizedTensor(final Tensor outputTensor, int num_bits){
+    public QuantizedTensor(final Tensor outputTensor, int num_bits, String imageId){
+        this.imageId = imageId;
         float [] tensor = outputTensor.getDataAsFloatArray();
         num_bits = 8;
         float qmin = 0.0f;
