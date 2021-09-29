@@ -37,7 +37,7 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
         Headers requestHeader = new Headers.Builder()
                 .add("w", Integer.toString(qx.originalWidth))
                 .add("h", Integer.toString(qx.originalHeight))
-                .add("image_id", "000000133244.jpg")
+                .add("image_id", qx.imageId)
                 .add("zero_point", Integer.toString(qx.zero_point))
                 .add("scale", Float.toString(qx.scale))
                 .build();
@@ -70,7 +70,6 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
         results.clear();
         for(JsonElement obj: data){
             Result r = parseJSONResult(obj.getAsJsonObject());
-            System.out.println(r);
             results.add(r);
         }
     }

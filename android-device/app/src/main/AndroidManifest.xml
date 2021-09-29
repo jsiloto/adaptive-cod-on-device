@@ -29,6 +29,11 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:name=".MaPActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

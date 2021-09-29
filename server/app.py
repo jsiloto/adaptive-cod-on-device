@@ -60,7 +60,7 @@ def test():
     print(request.data)
     return "OK"
 
-@app.route('/results', methods=['DELETE'])
+@app.route('/map', methods=['DELETE'])
 def clean_result():
     global complete_results
     complete_results = []
@@ -69,10 +69,11 @@ def clean_result():
         os.remove(results_filename)
     except:
         print("Error while deleting file ", results_filename)
+        open(results_filename, "w+")
     return "OK"
 
 
-@app.route('/results', methods=['GET'])
+@app.route('/map', methods=['GET'])
 def get_result():
     global complete_results
     cocoDt = cocoGt.loadRes(results_filename)
@@ -191,7 +192,9 @@ def split():
     im.save(reference_filename)
 
     detections = pred2det(results.pred[0], image_id, w, h)
-
+    complete_results += detections
+    with open('data.json', 'w') as f:
+        json.dump(complete_results, f)
     response = make_response(detection2response(detections), 200)
     response.mimetype = "text/plain"
 

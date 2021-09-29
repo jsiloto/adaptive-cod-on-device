@@ -8,7 +8,6 @@ package org.pytorch.demo.objectdetection;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -24,7 +23,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -115,35 +113,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         mResultView.setVisibility(View.INVISIBLE);
 
 
-        final Button buttonSelect = findViewById(R.id.selectButton);
-        buttonSelect.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mResultView.setVisibility(View.INVISIBLE);
-
-                final CharSequence[] options = { "Choose from Photos", "Take Picture", "Cancel" };
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("New Test Image");
-
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (options[item].equals("Take Picture")) {
-                            Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(takePicture, 0);
-                        }
-                        else if (options[item].equals("Choose from Photos")) {
-                            Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                            startActivityForResult(pickPhoto , 1);
-                        }
-                        else if (options[item].equals("Cancel")) {
-                            dialog.dismiss();
-                        }
-                    }
-                });
-                builder.show();
-            }
-        });
-
         final Button buttonLive = findViewById(R.id.liveButton);
         buttonLive.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -151,6 +120,16 @@ public class MainActivity extends AppCompatActivity implements Runnable {
               startActivity(intent);
             }
         });
+
+        final Button buttonMap = findViewById(R.id.mapButton);
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final Intent intent = new Intent(MainActivity.this, MaPActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
         mButtonDetect = findViewById(R.id.detectButton);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -175,7 +154,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         });
 
         try {
-            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "effd2_encoder.ptl"));
+            String modulePath = MainActivity.assetFilePath(getApplicationContext(), "effd2_encoder.ptl");
+            mModule = LiteModuleLoader.load(modulePath);
             BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("classes_efficientDet.txt")));
 
             String line;
@@ -230,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         }
     }
 
+
+
     @Override
     public void run() {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(mBitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
@@ -268,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
                 mIvScaleY, mStartX, mStartY);
 
         final ArrayList<Result> results =  resultScaler.RescaleResults(apiHandler.lastResults);
-        System.out.println(results);
         runOnUiThread(() -> {
             mButtonDetect.setEnabled(true);
             mButtonDetect.setText(getString(R.string.detect));
