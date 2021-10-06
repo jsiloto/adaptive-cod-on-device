@@ -214,10 +214,18 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public void run() {
+
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(mBitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
+
+        mModule.runMethod("set_width", IValue.from(1.0f));
         IValue outputTuple = mModule.forward(IValue.from(inputTensor));
         final Tensor outputTensor = outputTuple.toTensor();
+
+
+        mModule.runMethod("set_width", IValue.from(0.5f));
+        outputTuple = mModule.forward(IValue.from(inputTensor));
+        final Tensor outputTensor2 = outputTuple.toTensor();
 
 
         ApiHandler apiHandler = new ApiHandler();

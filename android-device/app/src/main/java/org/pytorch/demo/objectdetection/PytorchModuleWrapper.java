@@ -26,6 +26,9 @@ public class PytorchModuleWrapper {
         qx.originalHeight = bitmap.getHeight();
         return qx;
     }
+    public void setWidth(float width){
+        mModule.runMethod("set_width", IValue.from(width));
+    }
 
 
 }

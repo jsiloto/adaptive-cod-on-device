@@ -9,6 +9,7 @@ from tensor_utils import quantize_tensor
 
 encoder_model = torch.jit.load('../server/effd2_encoder.ptl')
 encoder_model.eval()
+encoder_model.set_width(0.25)
 
 
 def delete_results(base_url):
@@ -51,7 +52,7 @@ def split_offload(base_url, image, image_id):
 
     x = quantize_tensor(x, num_bits=8)
 
-
+    print("NUM BYTES = {}".format(len(x.tensor.numpy().astype(np.uint8).tobytes())))
     # x = x.numpy().astype(np.uint8)
 
     res = requests.post(url='http://0.0.0.0:5000/split',

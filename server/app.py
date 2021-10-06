@@ -34,9 +34,12 @@ complete_results = []
 elapsed_test = 0
 elapsed_reference = 0
 
-encoder = torch.jit.load('effd2_encoder.ptl')
+# encoder = torch.jit.load('effd2_encoder.ptl')
 decoder = torch.jit.load('effd2_decoder.ptl')
+
+
 decoder = AutoShapeDecoder(decoder)
+
 
 decoder.stride = torch.tensor([8., 16., 32.])
 decoder.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
@@ -166,8 +169,13 @@ def compute():
 @app.route('/split', methods=['POST'])
 def split():
     global complete_results
-    print(len(request.data))
-    data = np.fromstring(request.data, dtype=np.uint8).reshape([1, 12, 80, 80])
+    data = np.fromstring(request.data, dtype=np.uint8)
+    alpha = len(data)/(1*48*80*80)
+    print("#########################")
+    print("Setting Width: {}".format(alpha))
+    print("#########################")
+    decoder.model.set_width(alpha)
+    data = data.reshape([1, int(48*alpha), 80, 80])
     # data = np.fromstring(request.data, dtype=np.uint8).reshape([1, 3, 640, 640])
 
     image_id = request.headers['image_id']
