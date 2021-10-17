@@ -1,60 +1,48 @@
-import os
 import json
+import math
+import os
+import sys
+from json import encoder
+from os.path import exists
+
 import numpy as np
 import torch
 from PIL import Image
 from flask import Flask, render_template, request, send_file, make_response
-from models import get_models, detect, pred2det
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
-from yolov5.models.common import AutoShapeDecoder, AutoShapeEncoder, AutoShape
-from postprocess import detection2response
-from models import invert_afine
-import sys
-sys.path.insert(0, '../common')
-from tensor_utils import dequantize_tensor, QuantizedTensor
 
-annFile = '../resource/dataset/coco2017/annotations/instances_val2017.json'
+from models import get_models, detect, pred2det, affine
+from postprocess import detection2response
+from request import RequestParser
+
+sys.path.insert(0, './yolov5')
+from yolov5.models.common import Detections
+import torchvision.transforms as transforms
+
+encoder.FLOAT_REPR = lambda o: format(o, '.3f')
+
+annFile = '../resource/dataset/coco2017/annotations/instances_subval2017.json'
 cocoGt = COCO(annFile)
+
+# print(cocoGt.__dict__)
 
 app = Flask(__name__)
 
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
-app.config['UPLOAD_FOLDER'] = os.path.abspath("./photo/")
+app.config['UPLOAD_FOLDER'] = os.path.abspath("temp/")
 endpoint_filename = os.path.join(app.config['UPLOAD_FOLDER'], '<filename>')
 input_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'image.png')
-output_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'output.png')
-reference_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'reference.png')
-results_filename = "data.json"
+split_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'split_output.png')
+full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'output.png')
+results_filename = os.path.join(app.config['UPLOAD_FOLDER'], "data.json")
 
-reference_model, test_model = get_models()
+full_model, decoder_model = get_models()
 
 # Global State
 complete_results = []
 elapsed_test = 0
 elapsed_reference = 0
-
-# encoder = torch.jit.load('effd2_encoder.ptl')
-decoder = torch.jit.load('effd2_decoder.ptl')
-
-
-decoder = AutoShapeDecoder(decoder)
-
-
-decoder.stride = torch.tensor([8., 16., 32.])
-decoder.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
-                 'traffic light', 'fire hydrant', '', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
-                 'horse',
-                 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', '', 'backpack', 'umbrella', '', '', 'handbag',
-                 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
-                 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', '', 'wine glass', 'cup',
-                 'fork', 'knife',
-                 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
-                 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', '', 'dining table', '', '', 'toilet', '',
-                 'tv',
-                 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
-                 'refrigerator', '', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',
-                 'toothbrush']
 
 
 @app.route('/test', methods=['post'])
@@ -62,6 +50,7 @@ def test():
     print(request.headers)
     print(request.data)
     return "OK"
+
 
 @app.route('/map', methods=['DELETE'])
 def clean_result():
@@ -79,6 +68,9 @@ def clean_result():
 @app.route('/map', methods=['GET'])
 def get_result():
     global complete_results
+    if not exists(results_filename):
+        return {"stats": []}
+
     cocoDt = cocoGt.loadRes(results_filename)
     cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
     imgIds = [i['image_id'] for i in complete_results]
@@ -87,9 +79,9 @@ def get_result():
     cocoEval.evaluate()
     cocoEval.accumulate()
     cocoEval.summarize()
-    return {
-        "stats": cocoEval.stats.tolist()
-    }
+    stats = cocoEval.stats.tolist()
+    stats = [math.ceil(v * 1000) / 1000 for v in stats]
+    return {"stats": stats}
 
 
 @app.route('/')
@@ -97,8 +89,8 @@ def show_index():
     global elapsed_test, elapsed_reference
 
     try:
-    # running evaluation
-        cocoDt = cocoGt.loadRes('data.json')
+        # running evaluation
+        cocoDt = cocoGt.loadRes(results_filename)
         cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
         imgIds = [i['image_id'] for i in complete_results]
         cocoEval.params.imgIds = imgIds
@@ -110,8 +102,8 @@ def show_index():
 
     return render_template("index.html",
                            input_image=input_filename,
-                           output_image=output_filename,
-                           reference_image=reference_filename,
+                           split_result=split_filename,
+                           full_result=full_filename,
                            output_time=str(elapsed_test),
                            reference_time=str(elapsed_reference))
 
@@ -122,87 +114,75 @@ def image(filename=None):
     return send_file(filename, mimetype='image/png')
 
 
-def save_tensor_image(data):
-    data = np.swapaxes(data, 0, 2)
-    data = np.swapaxes(data, 0, 1)
-    image = Image.fromarray(data)
-    image.save(input_filename)
+
+def save_input_image(request_parser):
+    path = request_parser.image_path
+    image_id = request_parser.image_id
+    image = Image.open(path)
+    orig_w, orig_h = image.size
+
+    ids = cocoGt.getAnnIds(imgIds=[image_id])
+    id_vals = cocoGt.loadAnns(ids=ids)
+
+    vals = [{'bbox': affine(v['bbox'], orig_w, orig_h, size=768),
+             'category_id': v['category_id']} for v in id_vals]
+
+    image = [np.asarray(image)]
+    y = [torch.tensor([v['bbox'][:] + [1.0, v['category_id'] - 1] for v in vals])]
+
+    a = Detections(image, y, path, [], decoder_model.names, image[0].shape)
+    a.render()
+    Image.fromarray(a.imgs[0]).save(input_filename)
 
 
-@app.route('/compute', methods=['POST'])
-def compute():
-    global elapsed_test, elapsed_reference, complete_results
+def save_base_detection(path):
+    image = Image.open(path)
+    image.save(full_filename)
 
-    data = np.fromstring(request.data, dtype=np.uint8).reshape([3, 640, 640])
-    image_id = request.headers['image_id']
-    image_id = int(image_id.split('.jpg')[0])
-    w = int(request.headers['w'])
-    h = int(request.headers['h'])
 
-    print(image_id)
-    save_tensor_image(data)
-    x = torch.tensor(data.astype(np.float32) / 255)
+def save_split_detection(path, results):
+    im = Image.open(path)
+    results.imgs = [np.asarray(im)]
+    results.render()
+    im = Image.fromarray(results.imgs[0])
+    im.save(split_filename)
 
-    output, elapsed_test, detections = detect(x, test_model, image_id, orig_w=w, orig_h=h, size=640)
-    print(str(elapsed_test))
-    output.save(output_filename)
-    os.chmod(output_filename, 0o777)
 
-    # reference, elapsed_reference, detections_ref = detect(x, reference_model, image_id, orig_w=w, orig_h=h, size=640)
-    # print(str(elapsed_reference))
-    # reference.save(reference_filename)
-    # os.chmod(reference_filename, 0o777)
-
+def update_global_results(detections):
+    global complete_results
     complete_results += detections
+    mode = 'w'
+    if not exists(results_filename):
+        mode = 'w+'
 
-    with open('data.json', 'w') as f:
+    with open(results_filename, mode) as f:
         json.dump(complete_results, f)
-
-    os.chmod('data.json', 0o777)
-
-    response = make_response(detection2response(detections), 200)
-    response.mimetype = "text/plain"
-
-    return response
+    os.chmod(results_filename, 0o777)
 
 
 @app.route('/split', methods=['POST'])
 def split():
-    global complete_results
-    data = np.fromstring(request.data, dtype=np.uint8)
-    alpha = len(data)/(1*48*80*80)
-    print("#########################")
-    print("Setting Width: {}".format(alpha))
-    print("#########################")
-    decoder.model.set_width(alpha)
-    data = data.reshape([1, int(48*alpha), 80, 80])
-    # data = np.fromstring(request.data, dtype=np.uint8).reshape([1, 3, 640, 640])
+    request_parser = RequestParser(request)
+    save_input_image(request_parser)
+    save_base_detection(request_parser.image_path)
 
-    image_id = request.headers['image_id']
-    print(image_id)
-    image_path = os.path.join("../resource/dataset/coco2017/val2017/", image_id)
-    image_id = int(image_id.split('.jpg')[0])
-    w = int(request.headers['w'])
-    h = int(request.headers['h'])
-    scale = float(request.headers['scale'])
-    zero_point = float(request.headers['zero_point'])
+    # print("#########################")
+    # print("[{}]Setting Width: {}".format(request_parser.image_id, request_parser.alpha))
+    decoder_model.model.set_width(request_parser.alpha)
+    # print("#########################")
 
-    x = QuantizedTensor(tensor=torch.tensor(data), scale=scale, zero_point=zero_point)
-    # print(x)
-    x = dequantize_tensor(x)
-    results = decoder(x)
+    x = request_parser.dequantized_data
+    results = decoder_model(x, request_parser.w, request_parser.h)
 
-    from yolov5.models.common import Detections
-    im = Image.open(image_path).resize((640, 640), Image.ANTIALIAS)
-    results.imgs = [np.asarray(im)]
-    results.render()
-    im = Image.fromarray(results.imgs[0])
-    im.save(reference_filename)
+    save_split_detection(request_parser.image_path, results)
 
-    detections = pred2det(results.pred[0], image_id, w, h)
-    complete_results += detections
-    with open('data.json', 'w') as f:
-        json.dump(complete_results, f)
+    detections = pred2det(results.pred[0],
+                          request_parser.image_id,
+                          request_parser.w,
+                          request_parser.h)
+
+    update_global_results(detections)
+
     response = make_response(detection2response(detections), 200)
     response.mimetype = "text/plain"
 

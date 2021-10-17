@@ -1,6 +1,6 @@
 adaptive-cod/
 .idea/
-server/photo/
+server/temp/
 *.pt
 *.ptl
 *.jpg

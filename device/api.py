@@ -7,18 +7,18 @@ import sys
 sys.path.insert(0, '../common')
 from tensor_utils import quantize_tensor
 
-encoder_model = torch.jit.load('../server/effd2_encoder.ptl')
+encoder_model = torch.jit.load('../server/assets/effd2_encoder.ptl')
 encoder_model.eval()
 encoder_model.set_width(0.25)
 
 
 def delete_results(base_url):
-    url = urljoin(base_url, "results")
+    url = urljoin(base_url, "map")
     res = requests.delete(url=url)
     return res
 
 def get_results(base_url):
-    url = urljoin(base_url, "results")
+    url = urljoin(base_url, "map")
     res = requests.get(url=url)
     return res
 
@@ -27,7 +27,7 @@ def offload(base_url, image, image_id):
     url = urljoin(base_url, "compute")
     w = image.size[0]
     h = image.size[1]
-    image = image.resize((640, 640))
+    # image = image.resize((640, 640))
     x = tfunc.to_tensor(image)
     x = (x * 255).numpy().astype(np.uint8)
     res = requests.post(url='http://0.0.0.0:5000/compute',
@@ -41,14 +41,16 @@ def offload(base_url, image, image_id):
 
 
 def split_offload(base_url, image, image_id):
-    url = urljoin(base_url, "compute")
+    url = urljoin(base_url, "split")
     w = image.size[0]
     h = image.size[1]
-    image = image.resize((640, 640))
+    # image = image.resize((640, 640))
     x = tfunc.to_tensor(image)
     x = x.unsqueeze(0)
     with torch.no_grad():
         x = encoder_model(x)
+
+    print(x.shape)
 
     x = quantize_tensor(x, num_bits=8)
 
