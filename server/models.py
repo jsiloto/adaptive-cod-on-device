@@ -5,6 +5,8 @@ import yaml
 import torchvision.transforms as transforms
 from PIL import Image
 
+sys.path.insert(0, '../common')
+import constants
 sys.path.insert(0, './yolov5')
 from yolov5.models.common import AutoShape, AutoShapeDecoder
 
@@ -13,22 +15,7 @@ def get_models():
     full_model = torch.jit.load('./assets/effd2.ptl')
     full_model = AutoShape(full_model)
     full_model.stride = torch.tensor([8., 16., 32.])
-    full_model.names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
-                        'traffic light',
-                        'fire hydrant', '', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse',
-                        'sheep',
-                        'cow', 'elephant', 'bear', 'zebra', 'giraffe', '', 'backpack', 'umbrella', '', '', 'handbag',
-                        'tie',
-                        'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat',
-                        'baseball glove',
-                        'skateboard', 'surfboard', 'tennis racket', 'bottle', '', 'wine glass', 'cup', 'fork', 'knife',
-                        'spoon',
-                        'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
-                        'donut',
-                        'cake', 'chair', 'couch', 'potted plant', 'bed', '', 'dining table', '', '', 'toilet', '', 'tv',
-                        'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
-                        'refrigerator', '', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier',
-                        'toothbrush']
+    full_model.names = constants.class_names
 
     decoder_model = torch.jit.load('./assets/effd2_decoder.ptl')
     decoder_model = AutoShapeDecoder(decoder_model)

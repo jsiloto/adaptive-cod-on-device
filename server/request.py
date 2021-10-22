@@ -20,7 +20,17 @@ class RequestParser:
         self.data = data.reshape([1, int(48 * self.alpha), 96, 96])
         self.image_path = os.path.join(base_path, request.headers['image_id'])
 
-        scale = float(request.headers['scale'])
-        zero_point = float(request.headers['zero_point'])
-        x = QuantizedTensor(tensor=torch.tensor(self.data), scale=scale, zero_point=zero_point)
+        self.scale = float(request.headers['scale'])
+        self.zero_point = float(request.headers['zero_point'])
+        x = QuantizedTensor(tensor=torch.tensor(self.data), scale=self.scale, zero_point=self.zero_point)
         self.dequantized_data = dequantize_tensor(x)
+
+    def __str__(self):
+        s = "################# ID:{}################\n".format(self.image_id)
+        s += "w:{} h:{}\nScale:{}\nZero Point:{}\n{}\n".format(
+            self.w, self.h,
+            self.scale, self.zero_point,
+            self.dequantized_data
+        )
+        s += "######################################"
+        return s

@@ -5,6 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/textCurrentImage"
+        android:layout_width="184dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="176dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginEnd="177dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ProgressBar
         android:id="@+id/progressBarMap025"
         style="?android:attr/progressBarStyleHorizontal"
@@ -12,10 +24,30 @@
         android:layout_height="54dp"
         android:layout_marginStart="106dp"
         android:layout_marginEnd="106dp"
-        android:layout_marginBottom="68dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toTopOf="@+id/progressBarMap050"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Chronometer
+        android:id="@+id/chronometer025"
+        android:layout_width="78dp"
+        android:layout_height="23dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap025"
+        app:layout_constraintEnd_toEndOf="@+id/progressBarMap025" />
+
+    <EditText
+        android:id="@+id/text025"
+        android:layout_width="97dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Alpha=0.25"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap025"
+        app:layout_constraintStart_toStartOf="@+id/progressBarMap025" />
 
     <ProgressBar
         android:id="@+id/progressBarMap050"
@@ -24,10 +56,62 @@
         android:layout_height="54dp"
         android:layout_marginStart="106dp"
         android:layout_marginEnd="106dp"
-        android:layout_marginBottom="68dp"
+        android:layout_marginBottom="80dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap075"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Chronometer
+        android:id="@+id/chronometer050"
+        android:layout_width="78dp"
+        android:layout_height="23dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap050"
+        app:layout_constraintEnd_toEndOf="@+id/progressBarMap050" />
+
+    <EditText
+        android:id="@+id/text050"
+        android:layout_width="97dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Alpha=0.50"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap050"
+        app:layout_constraintStart_toStartOf="@+id/progressBarMap050" />
+
+    <ProgressBar
+        android:id="@+id/progressBarMap075"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="287dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="106dp"
+        android:layout_marginEnd="106dp"
+        android:layout_marginBottom="80dp"
         app:layout_constraintBottom_toTopOf="@+id/progressBarMap100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Chronometer
+        android:id="@+id/chronometer075"
+        android:layout_width="78dp"
+        android:layout_height="23dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap075"
+        app:layout_constraintEnd_toEndOf="@+id/progressBarMap075" />
+
+    <EditText
+        android:id="@+id/text075"
+        android:layout_width="97dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Alpha=0.75"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBarMap075"
+        app:layout_constraintStart_toStartOf="@+id/progressBarMap075" />
 
     <ProgressBar
         android:id="@+id/progressBarMap100"
@@ -41,66 +125,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/editTextTextPersonName"
-        android:layout_width="97dp"
-        android:layout_height="44dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Alpha=0.50"
-        app:layout_constraintBottom_toTopOf="@+id/progressBarMap050"
-        app:layout_constraintStart_toStartOf="@+id/progressBarMap050" />
-
-    <EditText
-        android:id="@+id/editTextTextPersonName3"
-        android:layout_width="97dp"
-        android:layout_height="44dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Alpha=0.25"
-        app:layout_constraintBottom_toTopOf="@+id/progressBarMap025"
-        app:layout_constraintStart_toStartOf="@+id/progressBarMap025" />
-
     <Chronometer
-        android:id="@+id/simpleChronometer025"
-        android:layout_width="78dp"
-        android:layout_height="23dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressBarMap025"
-        app:layout_constraintEnd_toEndOf="@+id/progressBarMap025" />
-
-    <Chronometer
-        android:id="@+id/simpleChronometer050"
-        android:layout_width="78dp"
-        android:layout_height="23dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressBarMap050"
-        app:layout_constraintEnd_toEndOf="@+id/progressBarMap050" />
-
-    <Chronometer
-        android:id="@+id/simpleChronometer100"
+        android:id="@+id/chronometer100"
         android:layout_width="72dp"
         android:layout_height="22dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@+id/progressBarMap100"
         app:layout_constraintEnd_toEndOf="@+id/progressBarMap100" />
 
-    <TextView
-        android:id="@+id/textCurrentImage"
-        android:layout_width="160dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="176dp"
-        android:layout_marginTop="224dp"
-        android:layout_marginEnd="177dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <EditText
-        android:id="@+id/editTextTextPersonName2"
+        android:id="@+id/text100"
         android:layout_width="97dp"
         android:layout_height="44dp"
+        android:layout_marginBottom="16dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Alpha=1.00"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/progressBarMap100"
         app:layout_constraintStart_toStartOf="@+id/progressBarMap100" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

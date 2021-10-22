@@ -42,12 +42,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity implements Runnable {
     private int mImageIndex = 0;
-    private String imageId = "000000031620.jpg";
+    private String imageId = "000000177893.jpg";
 
     private ImageView mImageView;
     private ResultView mResultView;
@@ -62,9 +63,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
     public static String assetFilePath(Context context, String assetName) throws IOException {
         File file = new File(context.getFilesDir(), assetName);
-        if (file.exists() && file.length() > 0) {
-            return file.getAbsolutePath();
-        }
 
         try (InputStream is = context.getAssets().open(assetName)) {
             try (OutputStream os = new FileOutputStream(file)) {
@@ -101,6 +99,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         setContentView(R.layout.activity_main);
 
         try {
+            String[] files = getAssets().list("coco_images/");
+            int rnd = new Random().nextInt(files.length);
+            imageId = files[rnd];
             mBitmap = BitmapFactory.decodeStream(getAssets().open("coco_images/"+imageId));
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);
@@ -211,13 +212,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     }
 
 
-
     @Override
     public void run() {
-
-        Bitmap resizedBitmap = Bitmap.createScaledBitmap(mBitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
-        final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
-
+        // TODO: Document differences in preprocessing from PIL to TensorImageUtils
+//        Bitmap resizedBitmap = Bitmap.createScaledBitmap(mBitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
+        final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(mBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
         mModule.runMethod("set_width", IValue.from(1.0f));
         IValue outputTuple = mModule.forward(IValue.from(inputTensor));
         final Tensor outputTensor = outputTuple.toTensor();

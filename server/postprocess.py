@@ -8,5 +8,6 @@ def filter_detection(det):
 
 
 def detection2response(detections):
+    # response = [filter_detection(d) for d in detections if d['score'] > 0.45]
     response = [filter_detection(d) for d in detections]
     return {"data": response}

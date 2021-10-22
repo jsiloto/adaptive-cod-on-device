@@ -4,12 +4,13 @@ import torchvision.transforms.functional as tfunc
 from urllib.parse import urljoin
 import torch
 import sys
+
 sys.path.insert(0, '../common')
 from tensor_utils import quantize_tensor
 
 encoder_model = torch.jit.load('../server/assets/effd2_encoder.ptl')
 encoder_model.eval()
-encoder_model.set_width(0.25)
+encoder_model.set_width(1.0)
 
 
 def delete_results(base_url):
@@ -17,10 +18,16 @@ def delete_results(base_url):
     res = requests.delete(url=url)
     return res
 
+
 def get_results(base_url):
     url = urljoin(base_url, "map")
     res = requests.get(url=url)
     return res
+
+
+def post_results(base_url, filename, results):
+    url = urljoin(base_url, "map/" + filename)
+    res = requests.post(url=url, data=results)
 
 
 def offload(base_url, image, image_id):
@@ -49,8 +56,6 @@ def split_offload(base_url, image, image_id):
     x = x.unsqueeze(0)
     with torch.no_grad():
         x = encoder_model(x)
-
-    print(x.shape)
 
     x = quantize_tensor(x, num_bits=8)
 

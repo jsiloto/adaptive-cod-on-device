@@ -31,7 +31,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         setContentView(R.layout.activity_map);
         mImageText = findViewById(R.id.textCurrentImage);
         progressBar = findViewById(R.id.progressBarMap100);
-        chronometer = findViewById(R.id.simpleChronometer100);
+        chronometer = findViewById(R.id.chronometer100);
 
         try {
             modulePath = MainActivity.assetFilePath(getApplicationContext(), "effd2_encoder.ptl");
@@ -59,15 +59,20 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
     public void run() {
 
         progressBar = findViewById(R.id.progressBarMap025);
-        chronometer = findViewById(R.id.simpleChronometer025);
+        chronometer = findViewById(R.id.chronometer025);
         run_at_alpha(0.25f, progressBar, chronometer);
 
         progressBar = findViewById(R.id.progressBarMap050);
-        chronometer = findViewById(R.id.simpleChronometer050);
+        chronometer = findViewById(R.id.chronometer050);
         run_at_alpha(0.50f, progressBar, chronometer);
 
+        progressBar = findViewById(R.id.progressBarMap075);
+        chronometer = findViewById(R.id.chronometer075);
+        run_at_alpha(0.75f, progressBar, chronometer);
+
+
         progressBar = findViewById(R.id.progressBarMap100);
-        chronometer = findViewById(R.id.simpleChronometer100);
+        chronometer = findViewById(R.id.chronometer100);
         run_at_alpha(1.00f, progressBar, chronometer);
 
     }
@@ -78,12 +83,11 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         int max_images = images.length;
-        max_images = 20;
+//        max_images = 20;
 
 //        for (int i = 0; i < images.length; i++) {
         for (int i = 0; i < max_images; i++) {
             mImageText.setText(images[i]);
-            progressBar.setProgress(i * (progressBar.getMax() - progressBar.getMin()) / max_images);
             try {
                 Bitmap bitmap = BitmapFactory.decodeStream(getAssets().open("coco_images/" + images[i]));
                 QuantizedTensor qx = moduleWrapper.run(bitmap, images[i]);
@@ -91,6 +95,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            progressBar.setProgress((i+1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
         }
 
         chronometer.stop();
