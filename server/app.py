@@ -61,10 +61,12 @@ def get_result():
     return {"stats": stats}
 
 
-@app.route('/map/<filename>', methods=['POST'])
-def post_results(filename=None):
-    with open(os.path.join("./temp/results/", filename), "w+") as f:
-        json.dump(request.data, f)
+@app.route('/data/<filename>', methods=['POST'])
+def post_data(filename=None):
+    data = json.loads(request.data)
+    with open(os.path.join("./temp/data/", filename), "w+") as f:
+        json.dump(data, f)
+    return "OK"
 
 
 @app.route('/')

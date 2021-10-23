@@ -15,7 +15,7 @@ class ResultManager:
         self.cocoGt = COCO(annFile)
         self.complete_results = []
         self.results_filename = results_filename
-        # If results file exists load them
+        # If data file exists load them
         if os.path.exists(results_filename):
             with open(results_filename, "r") as f:
                 self.complete_results = json.load(f)
@@ -26,9 +26,9 @@ class ResultManager:
         self.complete_results = []
         if os.path.exists(self.results_filename):
             os.remove(self.results_filename)
-        else:
-            with open(self.results_filename, "w+") as f:
-                json.dump(self.complete_results, f)
+
+        with open(self.results_filename, "w+") as f:
+            json.dump(self.complete_results, f)
 
         os.chmod(self.results_filename, safe_mode)
 

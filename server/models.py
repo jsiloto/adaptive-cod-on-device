@@ -45,7 +45,7 @@ def detect(im, model, image_id, w, h):
     end = time.time()
     elapsed = (end - start) / ntimes
     detections = pred2det(results.pred[0], image_id, w, h)
-    results.render()  # updates results.imgs with boxes and labels
+    results.render()  # updates data.imgs with boxes and labels
     return Image.fromarray(results.imgs[0]), elapsed, detections
 
 
