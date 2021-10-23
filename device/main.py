@@ -1,47 +1,45 @@
 import operator
 from functools import reduce  # Required in Python 3
 import time
-from dataset import subval_image_list
-from api import delete_results, get_results, offload, split_offload, post_results
 
-base_url = 'http://0.0.0.0:5000/'
+import tqdm
+
+from dataset import subval_image_list
+from api import API
 
 
 def prod(iterable):
     return reduce(operator.mul, iterable, 1)
 
 
-def compute_image_list(image_list, compute_func):
-    delete_results(base_url)
-    for i, (image, image_id) in enumerate(image_list):
+def compute_image_list(api, image_list):
+    api.delete_results()
+    pbar = tqdm.tqdm(enumerate(image_list))
+    for i, (image, image_id) in pbar:
         start = time.time()
-        # image, image_id = image_list[i]
-        compute_func(base_url, image, image_id)
+        api.split_offload(image, image_id)
         end = time.time()
         elapsed = (end - start)
-        print("[{}], Sample Processing Time: {}".format(image.size, elapsed))
-    result = get_results(base_url)
-    post_results(base_url, "test", result)
-    print(result.content)
+        message = "[{}], Sample Processing Time: {:2.3f}s".format(image.size, elapsed)
+        pbar.set_description(message)
+
+    result = api.get_results()
+    return result
+
 
 
 if __name__ == '__main__':
+    base_url = 'http://0.0.0.0:5000/'
+    api = API(base_url)
     image_list = subval_image_list()
 
-    # print("###############################")
-    # print("Computing using Full Offloading")
-    # compute_image_list(image_list, compute_func=offload)
+    def run_at_alpha(width):
+        print("############ Compute using Alpha: {:1.2f} ###################".format(width))
+        api.set_width(width)
+        result = compute_image_list(api, image_list)
+        api.post_data("mock_device_{:03d}".format(int(width*100)), result)
 
-    print("###############################")
-    print("Computing using Split Computing")
-    compute_image_list(image_list, compute_func=split_offload)
-
-    # result = get_results(base_url)
-    # print(result.content)
-
-# Build model
-# Load model from checkpoint
-# Load image and convert to tensor
-# Run Model (or not)
-# Serialize tensor
-# upload tensor
+    run_at_alpha(0.25)
+    run_at_alpha(0.50)
+    run_at_alpha(0.75)
+    run_at_alpha(1.00)
