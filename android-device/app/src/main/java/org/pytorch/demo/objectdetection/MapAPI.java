@@ -27,7 +27,7 @@ public class MapAPI {
         return true;
     }
 
-    public static Boolean getServerState(String url){
+    public static String getServerState(String url){
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(url)
@@ -36,13 +36,14 @@ public class MapAPI {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()){
-                return false;
+                return "";
             }
+            return response.body().string();
         }
         catch(IOException e) {
             e.printStackTrace();
+            return "";
         }
-        return true;
     }
 
 

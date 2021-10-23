@@ -85,21 +85,28 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         int max_images = images.length;
 //        max_images = 20;
 
-//        for (int i = 0; i < images.length; i++) {
         for (int i = 0; i < max_images; i++) {
             mImageText.setText(images[i]);
             try {
                 Bitmap bitmap = BitmapFactory.decodeStream(getAssets().open("coco_images/" + images[i]));
                 QuantizedTensor qx = moduleWrapper.run(bitmap, images[i]);
-//                apiHandler.postSplitTensor(qx);
+                apiHandler.postSplitTensor(qx);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            progressBar.setProgress((i+1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
+            progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
         }
 
-        chronometer.stop();
-        apiHandler.getServerMAP();
+        try {
+            while(apiHandler.response_counter[0] < max_images){
+                System.out.println("Waiting all requests to resolve");
+            }
+            chronometer.stop();
+            String results = apiHandler.getServerMAP();
+            apiHandler.postData(results, String.format("device_%3d", (int) (alpha * 100)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
