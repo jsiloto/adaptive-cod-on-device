@@ -4,7 +4,7 @@
 // This source code is licensed under the BSD-style license found in the
 // LICENSE file in the root directory of this source tree.
 
-package org.pytorch.demo.objectdetection;
+package org.recod.acod;
 
 import android.Manifest;
 import android.content.Context;
@@ -96,7 +96,9 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         Dataset.LoadFromDisk(getApplicationContext());
         Dataset dataset = Dataset.getInstance();
-        while(!dataset.isReady()); // Wait obb load
+        while(!dataset.isReady()){
+            System.out.println("Waiting obb mount. Are you sure the file is there?");
+        }; // Wait obb load
 
         try {
             File imageFile = dataset.getRandomImage();

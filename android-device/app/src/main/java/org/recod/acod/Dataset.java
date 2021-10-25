@@ -1,4 +1,4 @@
-package org.pytorch.demo.objectdetection;
+package org.recod.acod;
 
 import android.content.Context;
 import android.os.Environment;
@@ -17,7 +17,7 @@ public class Dataset {
 
     protected Dataset(Context context){
         obbPath = Environment.getExternalStorageDirectory() +
-                "/Android/obb/org.pytorch.demo.objectdetection/main.1.org.pytorch.demo.objectdetection.obb";
+                "/Android/obb/org.recod.acod/main.1.org.recod.acod.obb";
         storageManager = (StorageManager) context.getSystemService(context.STORAGE_SERVICE);
         storageManager.mountObb(obbPath, null, mEventListener);
     }
