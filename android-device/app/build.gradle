@@ -12,7 +12,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "org.pytorch.demo.objectdetection"
+        applicationId "org.recod.acod"
         minSdkVersion 28
         targetSdkVersion 30
         versionCode 1

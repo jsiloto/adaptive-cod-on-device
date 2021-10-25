@@ -1,4 +1,4 @@
-package org.pytorch.demo.objectdetection;
+package org.recod.acod;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

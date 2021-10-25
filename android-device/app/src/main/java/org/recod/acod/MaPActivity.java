@@ -1,4 +1,4 @@
-package org.pytorch.demo.objectdetection;
+package org.recod.acod;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.pytorch.Module;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class MaPActivity extends AppCompatActivity implements Runnable {
     private TextView mImageText;
@@ -82,16 +85,19 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         apiHandler.clearServerMAP();
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
+        File[] imageList = Dataset.getInstance().getFileList();
         int max_images = images.length;
-//        max_images = 20;
+        max_images = 50;
 
         for (int i = 0; i < max_images; i++) {
-            mImageText.setText(images[i]);
+            String imageId = imageList[i].getName();
+            mImageText.setText(imageId);
             try {
-                Bitmap bitmap = BitmapFactory.decodeStream(getAssets().open("coco_images/" + images[i]));
-                QuantizedTensor qx = moduleWrapper.run(bitmap, images[i]);
+                Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageList[i]));
+                QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
                 apiHandler.postSplitTensor(qx);
-            } catch (Exception e) {
+            } catch (IOException | ExecutionException | InterruptedException e) {
+                System.out.println("Error processing tensor");
                 e.printStackTrace();
             }
             progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
@@ -105,6 +111,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             String results = apiHandler.getServerMAP();
             apiHandler.postData(results, String.format("device_%3d", (int) (alpha * 100)));
         } catch (Exception e) {
+            System.out.println("Error processing results");
             e.printStackTrace();
         }
     }
