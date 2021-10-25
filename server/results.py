@@ -1,18 +1,20 @@
 import json
 import math
 import os
+import sys
 from pathlib import Path
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
+sys.path.insert(0, '../common')
+import constants
 
 safe_mode = 0o777  # LOL
-annFile = '../resource/dataset/coco2017/annotations/instances_subval2017.json'
 
 
 class ResultManager:
 
     def __init__(self, results_filename):
-        self.cocoGt = COCO(annFile)
+        self.cocoGt = COCO(constants.annFile)
         self.complete_results = []
         self.results_filename = results_filename
         # If data file exists load them

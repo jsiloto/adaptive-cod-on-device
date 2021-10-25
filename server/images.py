@@ -13,12 +13,11 @@ from yolov5.models.common import Detections
 
 
 safe_mode = 0o777  # LOL
-annFile = '../resource/dataset/coco2017/annotations/instances_subval2017.json'
 dataset_path = "/workspace/resource/dataset/coco2017/val2017/"
 
 class ImageManager:
     def __init__(self, ground_truth_image, prediction_image):
-        self.cocoGt = COCO(annFile)
+        self.cocoGt = COCO(constants.annFile)
         self.ground_truth_image = ground_truth_image
         self.prediction_image = prediction_image
 

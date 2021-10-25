@@ -1,4 +1,5 @@
-annFile = '../resource/dataset/coco2017/annotations/instances_subval2017.json'
+# annFile = '../resource/dataset/coco2017/annotations/instances_subval2017.json'
+annFile = '../resource/dataset/coco2017/annotations/instances_val2017.json'
 dataset_path = "/workspace/resource/dataset/coco2017/val2017/"
 class_names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
                'traffic light', 'fire hydrant', '', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
