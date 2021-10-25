@@ -16,3 +16,7 @@ docker run --rm -it --gpus all \
  -v /data/dataset/coco2017:/workspace/resource/dataset/coco2017 \
   --name acod-device acod-server /bin/bash
 ``
+
+```shell
+adb push android-device/app/src/main/main.1.org.pytorch.demo.objectdetection.obb /storage/emulated/0/Android/obb/org.pytorch.demo.objectdetection
+``

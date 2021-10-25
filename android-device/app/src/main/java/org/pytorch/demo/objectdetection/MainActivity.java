@@ -35,6 +35,7 @@ import org.pytorch.torchvision.TensorImageUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +43,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 
@@ -83,11 +83,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
-
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
         }
@@ -98,12 +93,19 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
         setContentView(R.layout.activity_main);
 
+
+        Dataset.LoadFromDisk(getApplicationContext());
+        Dataset dataset = Dataset.getInstance();
+        while(!dataset.isReady()); // Wait obb load
+
         try {
-            String[] files = getAssets().list("coco_images/");
-            int rnd = new Random().nextInt(files.length);
-            imageId = files[rnd];
-            mBitmap = BitmapFactory.decodeStream(getAssets().open("coco_images/"+imageId));
-        } catch (IOException e) {
+            File imageFile = dataset.getRandomImage();
+            imageId = imageFile.getName();
+            System.out.println(imageFile.canRead());
+//            String path = imageFile.getAbsolutePath();
+            FileInputStream fileInputStream = new FileInputStream(imageFile);
+            mBitmap = BitmapFactory.decodeStream(fileInputStream);
+        } catch (Exception e) {
             Log.e("Object Detection", "Error reading assets", e);
             finish();
         }
