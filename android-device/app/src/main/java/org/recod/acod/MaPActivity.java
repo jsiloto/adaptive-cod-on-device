@@ -3,6 +3,7 @@ package org.recod.acod;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.widget.Chronometer;
 import android.widget.ProgressBar;
@@ -60,6 +61,10 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public void run() {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "MyApp::MyWakelockTag");
+        wakeLock.acquire();
 
         progressBar = findViewById(R.id.progressBarMap025);
         chronometer = findViewById(R.id.chronometer025);
@@ -78,6 +83,8 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         chronometer = findViewById(R.id.chronometer100);
         run_at_alpha(1.00f, progressBar, chronometer);
 
+        wakeLock.release();
+
     }
 
     private void run_at_alpha(float alpha, ProgressBar progressBar, Chronometer chronometer) {
@@ -86,16 +93,18 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         File[] imageList = Dataset.getInstance().getFileList();
-        int max_images = images.length;
-        max_images = 50;
+        int max_images = imageList.length;
+//        max_images = 50;
 
         for (int i = 0; i < max_images; i++) {
             String imageId = imageList[i].getName();
             mImageText.setText(imageId);
             try {
-                Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(imageList[i]));
+                FileInputStream stream = new FileInputStream(imageList[i]);
+                Bitmap bitmap = BitmapFactory.decodeStream(stream);
                 QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
                 apiHandler.postSplitTensor(qx);
+                stream.close();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 System.out.println("Error processing tensor");
                 e.printStackTrace();
@@ -103,9 +112,12 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
         }
 
+
         try {
             while(apiHandler.response_counter[0] < max_images){
                 System.out.println("Waiting all requests to resolve");
+                System.out.println(String.format("Counter: %d/%d",
+                        apiHandler.response_counter[0], max_images));
             }
             chronometer.stop();
             String results = apiHandler.getServerMAP();
