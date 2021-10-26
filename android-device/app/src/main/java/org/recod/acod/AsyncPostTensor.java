@@ -19,12 +19,12 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
     private ArrayList<Result> results;
     private String url;
     private Gson jsonParser = new Gson();
-    private int [] response_counter;
+    private FrameTracker frameTracker;
 
-    public AsyncPostTensor(ArrayList<Result> results, String url, int[] response_counter){
+    public AsyncPostTensor(ArrayList<Result> results, String url, FrameTracker frameTracker){
         this.results = results;
         this.url = url;
-        this.response_counter = response_counter;
+        this.frameTracker = frameTracker;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
                 return false;
             }
             parseResults(response);
-            response_counter[0]++;
+            frameTracker.RegisterFrameEnd();
         }
         catch(IOException e) {
             e.printStackTrace();

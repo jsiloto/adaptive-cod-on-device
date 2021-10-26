@@ -13,19 +13,13 @@ import okhttp3.Response;
 public class ApiHandler {
     ArrayList<Result> lastResults = new ArrayList<>();
     String url = "http://192.168.15.172:5000/";
-    int[] response_counter;
 
-    public ApiHandler() {
-        response_counter = new int[1];
-        response_counter[0] = 0;
-    }
 
-    public void postSplitTensor(QuantizedTensor qx) throws ExecutionException, InterruptedException {
-        new AsyncPostTensor(lastResults, url + "split", response_counter).execute(qx);
+    public void postSplitTensor(QuantizedTensor qx, FrameTracker rt) throws ExecutionException, InterruptedException {
+        new AsyncPostTensor(lastResults, url + "split", rt).execute(qx);
     }
 
     public void clearServerMAP() {
-        response_counter[0] = 0;
         MapAPI.clearServerState(url + "map");
     }
 

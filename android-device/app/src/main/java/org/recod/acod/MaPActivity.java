@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class MaPActivity extends AppCompatActivity implements Runnable {
-    private TextView mImageText;
+    private TextView mImageText, mRoundTripText;
     private ProgressBar progressBar;
     private Thread thread;
     private String[] images;
@@ -28,14 +28,20 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
     private PytorchModuleWrapper moduleWrapper;
     private Chronometer chronometer;
     private ApiHandler apiHandler = new ApiHandler();
+    private long dnnTime;
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         mImageText = findViewById(R.id.textCurrentImage);
+        mRoundTripText = findViewById(R.id.textRoundTrip);
         progressBar = findViewById(R.id.progressBarMap100);
         chronometer = findViewById(R.id.chronometer100);
+
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MyApp::MyWakelockTag");
 
         try {
             modulePath = MainActivity.assetFilePath(getApplicationContext(), "effd2_encoder.ptl");
@@ -61,9 +67,6 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public void run() {
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "MyApp::MyWakelockTag");
         wakeLock.acquire();
 
         progressBar = findViewById(R.id.progressBarMap025);
@@ -78,46 +81,53 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         chronometer = findViewById(R.id.chronometer075);
         run_at_alpha(0.75f, progressBar, chronometer);
 
-
         progressBar = findViewById(R.id.progressBarMap100);
         chronometer = findViewById(R.id.chronometer100);
         run_at_alpha(1.00f, progressBar, chronometer);
 
         wakeLock.release();
-
     }
 
     private void run_at_alpha(float alpha, ProgressBar progressBar, Chronometer chronometer) {
-        moduleWrapper.setWidth(alpha);
         apiHandler.clearServerMAP();
+        moduleWrapper.setWidth(alpha);
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
+
         File[] imageList = Dataset.getInstance().getFileList();
         int max_images = imageList.length;
-//        max_images = 50;
+        max_images = 50;
+
+
+        FrameTracker frameTracker = new FrameTracker();
 
         for (int i = 0; i < max_images; i++) {
             String imageId = imageList[i].getName();
-            mImageText.setText(imageId);
+            frameTracker.RegisterNewFrame();
+            mImageText.setText(String.format("%s [%d/%d]",imageId, i, max_images));
+            mRoundTripText.setText(frameTracker.statistics());
             try {
                 FileInputStream stream = new FileInputStream(imageList[i]);
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
+
+                frameTracker.RegisterDnnStart();
                 QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
-                apiHandler.postSplitTensor(qx);
+
+                frameTracker.RegisterRequest();
+                apiHandler.postSplitTensor(qx, frameTracker);
                 stream.close();
             } catch (IOException | ExecutionException | InterruptedException e) {
                 System.out.println("Error processing tensor");
                 e.printStackTrace();
             }
             progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
+
         }
 
 
         try {
-            while(apiHandler.response_counter[0] < max_images){
+            while(!frameTracker.isDone()){
                 System.out.println("Waiting all requests to resolve");
-                System.out.println(String.format("Counter: %d/%d",
-                        apiHandler.response_counter[0], max_images));
             }
             chronometer.stop();
             String results = apiHandler.getServerMAP();
@@ -127,5 +137,4 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             e.printStackTrace();
         }
     }
-
 }
