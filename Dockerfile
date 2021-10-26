@@ -35,4 +35,4 @@ RUN pip install pycocotools numpy opencv-python tqdm tensorboard tensorboardX py
 RUN pip install wandb
 RUN pip install gevent gunicorn flask
 RUN pip install gradio seaborn
-#RUN pip install 'torchvision>=0.7.0'
+RUN pip install jsonlines

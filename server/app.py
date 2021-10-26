@@ -12,12 +12,11 @@ from flask import Flask, render_template, request, send_file, make_response
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
-from models import get_models, detect, pred2det, affine
+from models import get_decoder, detect, pred2det, affine
 from postprocess import detection2response
 from request import RequestParser
 from results import ResultManager
 from images import ImageManager
-
 sys.path.insert(0, './yolov5')
 from yolov5.models.common import Detections
 import torchvision.transforms as transforms
@@ -35,7 +34,8 @@ ground_truth_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'image.png')
 prediction_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'split_output.png')
 results_filename = os.path.join(app.config['UPLOAD_FOLDER'], "data.json")
 
-full_model, decoder_model = get_models()
+decoder_model = get_decoder()
+
 
 # Global State
 global_results = ResultManager(results_filename)
@@ -84,11 +84,10 @@ def image(filename=None):
     filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     return send_file(filename, mimetype='image/png')
 
-
 @app.route('/split', methods=['POST'])
 def split():
     request_parser = RequestParser(request)
-    image_manager.update_ground_truth(request_parser.image_id)
+
 
     # print("#########################")
     print("[{}]Setting Width: {}".format(request_parser.image_id, request_parser.alpha))
@@ -102,7 +101,8 @@ def split():
                           request_parser.w,
                           request_parser.h)
 
-    image_manager.update_prediction(request_parser.image_id, results)
+    # image_manager.update_ground_truth(request_parser.image_id)
+    # image_manager.update_prediction(request_parser.image_id, results)
     global_results.update(detections)
 
     response = make_response(detection2response(detections), 200)
