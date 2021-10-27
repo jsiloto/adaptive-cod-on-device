@@ -32,8 +32,8 @@ def compute_image_list(api, image_list):
 if __name__ == '__main__':
     base_url = 'http://0.0.0.0:5000/'
     api = API(base_url)
-    image_list = coco_image_list(subval=False)
-    image_list = [i for i in image_list if i[1] in ['000000127135.jpg', '000000127182.jpg']]
+    image_list = coco_image_list(subval=False)[0:10]
+    # image_list = [i for i in image_list if i[1] in ['000000127135.jpg', '000000127182.jpg']]
     # image_list = [i for i in image_list if i[1] in ['000000127092.jpg', '000000127182.jpg']]
     print(image_list)
 

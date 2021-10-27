@@ -7,4 +7,5 @@ gunicorn main:app \
           --timeout ${TIMEOUT} \
           --access-logfile - \
           --log-file - \
+          --worker-connections 1000 \
           --env PYTHONUNBUFFERED=1 -k gevent 2>&1

@@ -17,12 +17,16 @@ def get_models():
     full_model.stride = torch.tensor([8., 16., 32.])
     full_model.names = constants.class_names
 
+    decoder_model = get_decoder()
+
+    return full_model, decoder_model
+
+def get_decoder():
     decoder_model = torch.jit.load('./assets/effd2_decoder.ptl')
     decoder_model = AutoShapeDecoder(decoder_model)
     decoder_model.stride = torch.tensor([8., 16., 32.])
-    decoder_model.names = full_model.names
-
-    return full_model, decoder_model
+    decoder_model.names = constants.class_names
+    return decoder_model
 
 
 def get_yolo_model():

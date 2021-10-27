@@ -46,7 +46,7 @@ class API:
         with torch.no_grad():
             x = tfunc.to_tensor(image)
             x = x.unsqueeze(0)
-            x = self.encoder_model(x)
+            x = self.encoder_model(x) # approx 200ms
 
         x = quantize_tensor(x, num_bits=8)
         res = requests.post(url=url,

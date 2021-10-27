@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         qx.originalWidth = mBitmap.getWidth();
         qx.originalHeight = mBitmap.getHeight();
         try {
-            apiHandler.postSplitTensor(qx);
+            apiHandler.postSplitTensor(qx, new FrameTracker());
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

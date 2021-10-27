@@ -1,4 +1,5 @@
 # annFile = '../resource/dataset/coco2017/annotations/instances_subval2017.json'
+safe_mode = 0o777  # LOL
 annFile = '../resource/dataset/coco2017/annotations/instances_val2017.json'
 dataset_path = "/workspace/resource/dataset/coco2017/val2017/"
 class_names = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
