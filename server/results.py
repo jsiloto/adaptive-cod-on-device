@@ -9,9 +9,6 @@ sys.path.insert(0, '../common')
 import constants
 import jsonlines
 
-safe_mode = 0o777  # LOL
-
-
 class ResultManager:
 
     def __init__(self, results_filename):
@@ -28,17 +25,18 @@ class ResultManager:
         with open(self.results_filename, "w+") as f:
             pass
 
-        os.chmod(self.results_filename, safe_mode)
+        os.chmod(self.results_filename, constants.safe_mode)
 
     def update(self, detections):
-        with jsonlines.open(self.results_filename, mode='w') as writer:
-            writer.write(detections)
+        with jsonlines.open(self.results_filename, mode='a') as writer:
+            for d in detections:
+                writer.write(d)
 
     def get(self):
         with open(self.results_filename, mode='r') as f:
             self.complete_results = json.load(f)
 
-        os.chmod(self.results_filename, safe_mode)
+        os.chmod(self.results_filename, constants.safe_mode)
         cocoDt = self.cocoGt.loadRes(self.results_filename)
         cocoEval = COCOeval(self.cocoGt, cocoDt, 'bbox')
         imgIds = [i['image_id'] for i in self.complete_results]

@@ -21,6 +21,9 @@ sys.path.insert(0, './yolov5')
 from yolov5.models.common import Detections
 import torchvision.transforms as transforms
 
+sys.path.insert(0, '../common')
+import constants
+
 encoder.FLOAT_REPR = lambda o: format(o, '.3f')
 
 # print(cocoGt.__dict__)
@@ -64,8 +67,10 @@ def get_result():
 @app.route('/data/<filename>', methods=['POST'])
 def post_data(filename=None):
     data = json.loads(request.data)
-    with open(os.path.join("./temp/data/", filename), "w+") as f:
+    full_path = os.path.join("./temp/data/", filename)
+    with open(full_path, "w+") as f:
         json.dump(data, f)
+    os.chmod(full_path, constants.safe_mode)
     return "OK"
 
 
