@@ -11,12 +11,17 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.pytorch.Module;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+
+
 
 public class MaPActivity extends AppCompatActivity implements Runnable {
     private TextView mImageText, mRoundTripText;
@@ -96,7 +101,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
 
         File[] imageList = Dataset.getInstance().getFileList();
         int max_images = imageList.length;
-        max_images = 50;
+//        max_images = 10;
 
 
         FrameTracker frameTracker = new FrameTracker();
@@ -131,7 +136,9 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             }
             chronometer.stop();
             String results = apiHandler.getServerMAP();
-            apiHandler.postData(results, String.format("device_%3d", (int) (alpha * 100)));
+            JsonObject jsonObject =  JsonParser.parseString(results).getAsJsonObject();
+            jsonObject.add("performance", JsonParser.parseString(String.valueOf(frameTracker)));
+            apiHandler.postData(jsonObject.toString(), String.format("device_%3d.json", (int) (alpha * 100)));
         } catch (Exception e) {
             System.out.println("Error processing results");
             e.printStackTrace();

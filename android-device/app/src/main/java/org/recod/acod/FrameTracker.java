@@ -62,8 +62,22 @@ public class FrameTracker {
         return message;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "\"responseCounter\":" + responseCounter +
+                ", \"frameCounter\":" + frameCounter +
+                ", \"averageFrameTime\":" + averageFrameTime +
+                ", \"averagePreprocessTime\":" + averagePreprocessTime +
+                ", \"averageDnnTime\":" + averageDnnTime +
+                ", \"averageRoundTripTime\":" + averageRoundTripTime +
+                '}';
+    }
+
     private static double CalcAverage(double delta, double prevAverage, int counter) {
         double avg = (prevAverage * (counter - 1) + delta) / counter;
         return avg;
     }
+
+
 }
