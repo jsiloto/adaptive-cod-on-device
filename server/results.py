@@ -33,11 +33,15 @@ class ResultManager:
                 writer.write(d)
 
     def get(self):
-        with open(self.results_filename, mode='r') as f:
-            self.complete_results = json.load(f)
+        jsonfile = self.results_filename[:-1]
+        with jsonlines.open(self.results_filename, mode='r') as jnl:
+            self.complete_results = list(jnl.iter())
 
-        os.chmod(self.results_filename, constants.safe_mode)
-        cocoDt = self.cocoGt.loadRes(self.results_filename)
+        with open(jsonfile, mode='w+') as f:
+            json.dump(self.complete_results, f)
+
+        os.chmod(jsonfile, constants.safe_mode)
+        cocoDt = self.cocoGt.loadRes(jsonfile)
         cocoEval = COCOeval(self.cocoGt, cocoDt, 'bbox')
         imgIds = [i['image_id'] for i in self.complete_results]
         cocoEval.params.imgIds = imgIds

@@ -35,7 +35,7 @@ app.config['UPLOAD_FOLDER'] = os.path.abspath("temp/")
 endpoint_filename = os.path.join(app.config['UPLOAD_FOLDER'], '<filename>')
 ground_truth_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'image.png')
 prediction_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'split_output.png')
-results_filename = os.path.join(app.config['UPLOAD_FOLDER'], "data.json")
+results_filename = os.path.join(app.config['UPLOAD_FOLDER'], "data.jsonl")
 
 decoder_model = get_decoder()
 
