@@ -14,7 +14,10 @@ class RequestParser:
     def __init__(self, request):
         self.w = int(request.headers['w'])
         self.h = int(request.headers['h'])
-        self.image_id = int(request.headers['image_id'].split('.jpg')[0])
+        try:
+            self.image_id = int(request.headers['image_id'].split('.jpg')[0])
+        except ValueError:
+            self.image_id = 0
         data = np.fromstring(request.data, dtype=np.uint8)
         self.alpha = len(data) / (1 * 48 * 96 * 96)
         self.data = data.reshape([1, int(48 * self.alpha), 96, 96])

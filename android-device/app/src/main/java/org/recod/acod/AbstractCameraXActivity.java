@@ -9,14 +9,11 @@ package org.recod.acod;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Size;
 import android.view.TextureView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
-import androidx.annotation.WorkerThread;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageAnalysisConfig;
@@ -82,25 +79,11 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {
                 .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
                 .build();
         final ImageAnalysis imageAnalysis = new ImageAnalysis(imageAnalysisConfig);
-        imageAnalysis.setAnalyzer((image, rotationDegrees) -> {
-            if (SystemClock.elapsedRealtime() - mLastAnalysisResultTime < 500) {
-                return;
-            }
-
-            final R result = analyzeImage(image, rotationDegrees);
-            if (result != null) {
-                mLastAnalysisResultTime = SystemClock.elapsedRealtime();
-                runOnUiThread(() -> applyToUiAnalyzeImageResult(result));
-            }
-        });
+        imageAnalysis.setAnalyzer((image, rotationDegrees) -> {analyzeImageAndUpdateUI(image, rotationDegrees);});
 
         CameraX.bindToLifecycle(this, preview, imageAnalysis);
     }
 
-    @WorkerThread
     @Nullable
-    protected abstract R analyzeImage(ImageProxy image, int rotationDegrees);
-
-    @UiThread
-    protected abstract void applyToUiAnalyzeImageResult(R result);
+    protected abstract void analyzeImageAndUpdateUI(ImageProxy image, int rotationDegrees);
 }
