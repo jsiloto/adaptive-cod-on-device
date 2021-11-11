@@ -25,10 +25,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetectionActivity.AnalysisResult> {
-    private Module mModule = null;
     private ResultView mResultView;
+    private PytorchModuleWrapper moduleWrapper = null;
+    private ApiHandler apiHandler = new ApiHandler();
+    FrameTracker frameTracker = new FrameTracker();
 
     static class AnalysisResult {
         private final ArrayList<Result> mResults;
@@ -85,8 +88,9 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     @Nullable
     protected AnalysisResult analyzeImage(ImageProxy image, int rotationDegrees) {
         try {
-            if (mModule == null) {
-                mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "yolov5s.torchscript.ptl"));
+            if (moduleWrapper == null) {
+                String modulePath = MainActivity.assetFilePath(getApplicationContext(), "effd2_encoder.ptl");
+                moduleWrapper = new PytorchModuleWrapper(modulePath);
             }
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);
@@ -97,6 +101,11 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         matrix.postRotate(90.0f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
+
+
+        QuantizedTensor qx = moduleWrapper.run(bitmap, "");
+        apiHandler.postSplitTensor(qx, frameTracker);
+
 
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
         IValue[] outputTuple = mModule.forward(IValue.from(inputTensor)).toTuple();
