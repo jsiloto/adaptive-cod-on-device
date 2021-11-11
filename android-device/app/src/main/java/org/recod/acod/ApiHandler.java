@@ -2,8 +2,6 @@ package org.recod.acod;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -11,12 +9,10 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ApiHandler {
-    ArrayList<Result> lastResults = new ArrayList<>();
     String url = "http://192.168.15.172:5000/";
 
-
-    public void postSplitTensor(QuantizedTensor qx, FrameTracker rt) throws ExecutionException, InterruptedException {
-        new AsyncPostTensor(lastResults, url + "split", rt).execute(qx);
+    public void postSplitTensor(QuantizedTensor qx, AsyncPostTensor.onPostExecuteCallback callback) {
+        new AsyncPostTensor(url + "split", callback).execute(qx);
     }
 
     public void clearServerMAP() {

@@ -4,7 +4,7 @@ package org.recod.acod;
 public class FrameTracker {
     private int responseCounter = 0;
     private int frameCounter = 0;
-    private long trackerStart;
+    private long trackerStart = 0;
     private long frameStart = 0;
     private long dnnStart = 0;
     private long requestStart = 0;
@@ -13,15 +13,13 @@ public class FrameTracker {
     private double averageDnnTime = 0;
     private double averageRoundTripTime = 0;
 
-
-    public FrameTracker() {
-        trackerStart = System.currentTimeMillis();
-    }
-
     // All the following methods should be called in this order
     public void RegisterNewFrame() {
         frameCounter++;
         frameStart = System.currentTimeMillis();
+        if(trackerStart == 0){
+            trackerStart = frameStart;
+        }
     }
 
     public void RegisterDnnStart() {

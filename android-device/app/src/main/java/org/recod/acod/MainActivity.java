@@ -43,7 +43,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity implements Runnable {
@@ -56,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {
     private ProgressBar mProgressBar;
     private Bitmap mBitmap = null;
     private Module mModule = null;
-//    private Module encoder = null;
-//    private Module decoder = null;
     private float mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY;
 
 
@@ -232,43 +229,30 @@ public class MainActivity extends AppCompatActivity implements Runnable {
 
 
         ApiHandler apiHandler = new ApiHandler();
-
-//        QuantizedTensor qbitmap = new QuantizedTensor(resizedBitmap);
-//        qbitmap.originalWidth = mBitmap.getWidth();
-//        qbitmap.originalHeight = mBitmap.getHeight();
-//        try {
-//            apiHandler.postImageTensor(qbitmap);
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
         QuantizedTensor qx = new QuantizedTensor(outputTensor, 8, imageId);
         qx.originalWidth = mBitmap.getWidth();
         qx.originalHeight = mBitmap.getHeight();
-        try {
-            apiHandler.postSplitTensor(qx, new FrameTracker());
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+        class drawResults implements AsyncPostTensor.onPostExecuteCallback {
+            @Override
+            public void execute(ArrayList<Result> results) {
+                ResultScaler resultScaler = new ResultScaler(
+                        mImgScaleX, mImgScaleY, mIvScaleX,
+                        mIvScaleY, mStartX, mStartY);
+                final ArrayList<Result> scaledResults =
+                        resultScaler.RescaleResults(results);
+                runOnUiThread(() -> {
+                    mButtonDetect.setEnabled(true);
+                    mButtonDetect.setText(getString(R.string.detect));
+                    mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                    mResultView.setResults(scaledResults);
+                    mResultView.invalidate();
+                    mResultView.setVisibility(View.VISIBLE);
+                });
+            }
         }
 
-//        final float[] outputs = outputTensor.getDataAsFloatArray();
-        ResultScaler resultScaler = new ResultScaler(
-                mImgScaleX, mImgScaleY, mIvScaleX,
-                mIvScaleY, mStartX, mStartY);
-
-        final ArrayList<Result> results =  resultScaler.RescaleResults(apiHandler.lastResults);
-        runOnUiThread(() -> {
-            mButtonDetect.setEnabled(true);
-            mButtonDetect.setText(getString(R.string.detect));
-            mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-            mResultView.setResults(results);
-            mResultView.invalidate();
-            mResultView.setVisibility(View.VISIBLE);
-        });
+        apiHandler.postSplitTensor(qx, new drawResults());
     }
 
 }

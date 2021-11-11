@@ -19,8 +19,7 @@ import org.pytorch.Module;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
+import java.util.ArrayList;
 
 
 public class MaPActivity extends AppCompatActivity implements Runnable {
@@ -105,6 +104,12 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
 
 
         FrameTracker frameTracker = new FrameTracker();
+        class TrackerCallback implements AsyncPostTensor.onPostExecuteCallback {
+            @Override
+            public void execute(ArrayList<Result> results) {
+                frameTracker.RegisterFrameEnd();
+            }
+        }
 
         for (int i = 0; i < max_images; i++) {
             String imageId = imageList[i].getName();
@@ -119,9 +124,9 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
                 QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
 
                 frameTracker.RegisterRequest();
-                apiHandler.postSplitTensor(qx, frameTracker);
+                apiHandler.postSplitTensor(qx, new TrackerCallback());
                 stream.close();
-            } catch (IOException | ExecutionException | InterruptedException e) {
+            } catch (IOException e) {
                 System.out.println("Error processing tensor");
                 e.printStackTrace();
             }

@@ -13,18 +13,21 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
+public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, ArrayList<Result>> {
     private OkHttpClient client;
     private Response response;
-    private ArrayList<Result> results;
     private String url;
     private Gson jsonParser = new Gson();
     private FrameTracker frameTracker;
+    private onPostExecuteCallback callback;
 
-    public AsyncPostTensor(ArrayList<Result> results, String url, FrameTracker frameTracker){
-        this.results = results;
+    public AsyncPostTensor(String url, onPostExecuteCallback callback){
         this.url = url;
-        this.frameTracker = frameTracker;
+        this.callback = callback;
+    }
+
+    public interface onPostExecuteCallback{
+        void execute(ArrayList<Result> results);
     }
 
     @Override
@@ -34,7 +37,7 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
 
     }
     @Override
-    protected Boolean doInBackground(QuantizedTensor... qxs) {
+    protected ArrayList<Result> doInBackground(QuantizedTensor... qxs) {
         QuantizedTensor qx = qxs[0];
         Headers requestHeader = new Headers.Builder()
                 .add("w", Integer.toString(qx.originalWidth))
@@ -51,30 +54,37 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, Boolean> {
                 .post(requestBody)
                 .build();
 
+        ArrayList<Result> results = new ArrayList<>();;
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()){
-                return false;
+            if (response.isSuccessful()){
+                results = parseResponse(response);
             }
-            parseResults(response);
-            frameTracker.RegisterFrameEnd();
         }
         catch(IOException e) {
             e.printStackTrace();
         }
-        return true;
+        return results;
     }
 
-    private void parseResults(Response response) throws IOException {
-//        System.out.println(response.body().string());
+    @Override
+    protected void onPostExecute(ArrayList<Result> results) {
+        callback.execute(results);
+    }
 
+    private ArrayList<Result> parseResponse(Response response) throws IOException {
+        float threshold = 0.5f;
+
+        ArrayList<Result> results = new ArrayList<>();
         final String responseBody = response.body().string();
         JsonObject jsonObject =  JsonParser.parseString(responseBody).getAsJsonObject();
         JsonArray data = jsonObject.getAsJsonArray("data");
-        results.clear();
         for(JsonElement obj: data){
             Result r = parseJSONResult(obj.getAsJsonObject());
-            results.add(r);
+            if (r.score > threshold){
+                results.add(r);
+            }
         }
+        return results;
     }
     private Result parseJSONResult(JsonObject obj){
         int[] numbers = jsonParser.fromJson(obj.getAsJsonObject().get("bbox"), int[].class);
