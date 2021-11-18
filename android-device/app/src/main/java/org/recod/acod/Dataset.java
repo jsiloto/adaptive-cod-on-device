@@ -7,6 +7,7 @@ import android.os.storage.StorageManager;
 import android.util.Log;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Random;
 
 // Dataset Singleton
@@ -55,11 +56,18 @@ public class Dataset {
         return listOfFiles[rnd];
     }
 
-    public File[] getFileList(){
+    public File[] getFileList(int numFiles){
         String f = storageManager.getMountedObbPath(obbPath);
         File folder = new File(f);
         File[] listOfFiles = folder.listFiles();
+        if(numFiles > 0){
+            File[] newArray = Arrays.copyOfRange(listOfFiles, 0, numFiles);
+            return newArray;
+        }
         return listOfFiles;
+    }
+    public File[] getFileList(){
+        return getFileList(-1);
     }
 
 }
