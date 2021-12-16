@@ -9,7 +9,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ApiHandler {
-    String url = "http://192.168.15.172:5000/";
+    String url = "http://192.168.1.102:5000/";
 
     public void postSplitTensor(QuantizedTensor qx, AsyncPostTensor.onPostExecuteCallback callback) {
         new AsyncPostTensor(url + "split", callback).execute(qx);

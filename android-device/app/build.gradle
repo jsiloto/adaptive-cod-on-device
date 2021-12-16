@@ -11,6 +11,18 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
+    packagingOptions {
+        pickFirst 'lib/arm64-v8a/libfbjni.so'
+        pickFirst 'lib/arm64-v8a/libpytorch_jni_lite.so'
+        pickFirst 'lib/armeabi-v7a/libfbjni.so'
+        pickFirst 'lib/armeabi-v7a/libpytorch_jni_lite.so'
+        pickFirst 'lib/x86/libfbjni.so'
+        pickFirst 'lib/x86/libpytorch_jni_lite.so'
+        pickFirst 'lib/x86_64/libfbjni.so'
+        pickFirst 'lib/x86_64/libpytorch_jni_lite.so'
+    }
+
+
     defaultConfig {
         applicationId "org.recod.acod"
         minSdkVersion 28
@@ -40,6 +52,7 @@ android {
 //val kotlin_version: String by rootProject.extra
 
 dependencies {
+
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
     implementation("com.squareup.okhttp3:okhttp:4.9.1")

@@ -51,12 +51,13 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
     public void run() {
         String results = "";
         try {
-            results += "\n" + new LatencyExperiment("efficientdet_wightman.ptl", this.getApplicationContext()).run();
-            textResults.setText(results);
-            results += "\n" + new LatencyExperiment("yolov5s.torchscript.ptl", this.getApplicationContext()).run();
-            textResults.setText(results);
-            results += "\n" + new LatencyExperiment("effd2_full.ptl", this.getApplicationContext()).run();
-            textResults.setText(results);
+//            results += "\n" + new LatencyExperiment("efficientdet_wightman.ptl", this.getApplicationContext()).run();
+//            textResults.setText(results);
+            //TODO(jsiloto): Add width and heigth
+ //           results += "\n" + new LatencyExperiment("yolov5s.torchscript.ptl", this.getApplicationContext()).run();
+  //          textResults.setText(results);
+   //         results += "\n" + new LatencyExperiment("effd2_full.ptl", this.getApplicationContext()).run();
+    //        textResults.setText(results);
             results += "\n" + new LatencyExperiment("effd2_encoder.ptl", this.getApplicationContext()).run();
             textResults.setText(results);
         } catch (IOException e) {

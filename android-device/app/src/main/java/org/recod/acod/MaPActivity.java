@@ -100,7 +100,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
 
         File[] imageList = Dataset.getInstance().getFileList();
         int max_images = imageList.length;
-//        max_images = 10;
+        max_images = 15;
 
 
         FrameTracker frameTracker = new FrameTracker();

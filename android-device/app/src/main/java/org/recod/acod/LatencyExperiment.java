@@ -51,7 +51,7 @@ public class LatencyExperiment  {
             }
 
             Bitmap bitmap = BitmapFactory.decodeStream(stream);
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 640, 640, true);
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 768, 768, true);
             return resizedBitmap;
         }).toArray(Bitmap[]::new);
 
