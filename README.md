@@ -20,7 +20,7 @@ docker run --rm -it --gpus all \
 ```shell
 ~/Android/Sdk/tools/bin/jobb -d /data/dataset/coco2017/val2017/ -o main.1.org.recod.acod.obb -pn org.recod.acod -pv 1
 adb shell mkdir /storage/emulated/0/Android/obb/org.recod.acod/
-adb push main.1.org.recod.acod.obb /storage/emulated/0/Android/obb/org.recod.acod/
+adb push main.1.org.recod.acod.obb /storage/emulated/0/Android/obb/org.recod.acod/main.1.org.recod.acod.obb
 rm  main.1.org.recod.acod.obb
 ```
 
