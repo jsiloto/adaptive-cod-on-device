@@ -56,6 +56,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         moduleWrapper = new PytorchModuleWrapper(modulePath);
 
         thread = new Thread(MaPActivity.this);
+        thread.setPriority(Thread.MAX_PRIORITY);
         thread.start();
     }
 
