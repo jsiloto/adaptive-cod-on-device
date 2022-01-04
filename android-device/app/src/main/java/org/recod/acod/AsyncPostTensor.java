@@ -6,15 +6,8 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
-
 public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, ArrayList<Result>> {
-    private OkHttpClient client;
-    private Response response;
-    private String url;
     private Gson jsonParser = new Gson();
-    private FrameTracker frameTracker;
     private onPostExecuteCallback callback;
     private PostTensor postTensor;
 
@@ -34,7 +27,9 @@ public class AsyncPostTensor extends AsyncTask<QuantizedTensor, Void, ArrayList<
 
     @Override
     protected void onPostExecute(ArrayList<Result> results) {
-        callback.execute(results);
+        if(callback != null){
+            callback.execute(results);
+        }
     }
 
 

@@ -22,22 +22,70 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 
-public class LatencyExperiment  {
+public class ExperimentRunner {
 
-    private Module module = null;
-    private String modelName;
+    private PytorchModuleWrapper moduleWrapper;
+    private File[] imageList;
+    private int max_images = 500;
+    private ApiHandler apiHandler = new ApiHandler();
 
-    LatencyExperiment(String modelName, Context context) throws IOException {
-        String modulePath = Helper.assetFilePath(context, modelName);
-        this.modelName = modelName;
-        module = LiteModuleLoader.load(modulePath);
-        module.runMethod("set_width", IValue.from(0.25));
+    ExperimentRunner(PytorchModuleWrapper moduleWrapper, ApiHandler apiHandler){
+        this.moduleWrapper = moduleWrapper;
+        this.apiHandler = apiHandler;
+        imageList = Dataset.getInstance().getFileList(max_images);
     }
 
     public String run(){
+        for (int i = 0; i < max_images; i++) {
+            String imageId = imageList[i].getName();
+            try {
+                FileInputStream stream = new FileInputStream(imageList[i]);
+                Bitmap bitmap = BitmapFactory.decodeStream(stream);
+                QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
+                apiHandler.postSplitTensor(qx, new TrackerCallback());
+                stream.close();
+            } catch (IOException e) {
+                System.out.println("Error processing tensor");
+                e.printStackTrace();
+            }
+            progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
 
-        int max_images = 5;
-        File[] imageList = Dataset.getInstance().getFileList(max_images);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        File[] imageList = Dataset.getInstance().getFileList();
         Bitmap[] bitmaps = Stream.of(imageList).map((a)->{
             FileInputStream stream = null;
             try {
