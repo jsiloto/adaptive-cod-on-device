@@ -31,11 +31,7 @@ public class LatencyExperiment  {
         String modulePath = Helper.assetFilePath(context, modelName);
         this.modelName = modelName;
         module = LiteModuleLoader.load(modulePath);
-        try {
-            module.runMethod("set_width", IValue.from(0.25));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        module.runMethod("set_width", IValue.from(0.25));
     }
 
     public String run(){
