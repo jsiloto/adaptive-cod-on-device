@@ -17,8 +17,10 @@ public class PytorchModuleWrapper {
     }
 
     public PytorchModuleWrapper(String modulePath, boolean dummy) {
-        mModule = LiteModuleLoader.load(modulePath);
         this.dummy = dummy;
+        if(!dummy){
+            mModule = LiteModuleLoader.load(modulePath);
+        }
     }
 
 

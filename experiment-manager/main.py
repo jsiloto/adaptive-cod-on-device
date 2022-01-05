@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.dates import DayLocator, HourLocator, DateFormatter, drange
 from bluetooth import *
+from apk_manager import ApkManager
 from um25c import UM25C
 import adbutils
+import os
 
 def measure_power(um25c_device: UM25C, seconds=10):
     data = um25c_device.query()
@@ -23,10 +25,30 @@ def measure_power(um25c_device: UM25C, seconds=10):
 
 if __name__ == "__main__":
 
-    adb = adbutils.AdbClient(host="127.0.0.1", port=5037)
-    d = adb.device()
-    print(d.serial)  # 获取序列号
+    os.system('adb root')
+    os.system('adb shell setenforce 0')
+    adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
+    adb_device = adb_client.device()
+    apk_manager = ApkManager(adb_device=adb_device, apk_filepath="")
+    apk_manager.start()
+    exit()
 
+
+    print(d.serial)  # 获取序列号
+    d.shell("root")
+    time.sleep(3)
+    # d.install("../android-device/app/build/outputs/apk/debug/app-debug.apk")
+
+
+    d.shell("am force-stop com.jsiloto.myapplication")
+    d.shell("logcat --clear")
+    a = d.shell("am start -n com.jsiloto.myapplication/.DisplayMessageActivity -e TEST \"abcds\"")
+    print(a)
+    time.sleep(3)
+    a = d.shell("logcat -d -e \"ExperimentOutput\"")
+    print(a)
+    d.shell("am force-stop com.jsiloto.myapplication")
+    exit()
     # Parse arguments
     parser = argparse.ArgumentParser(description="CLI for USB Meter")
     parser.add_argument("--addr", dest="addr", type=str, help="Address of USB Meter", required=True)
