@@ -18,8 +18,13 @@ from um25c import UM25C
 import adbutils
 import os
 
+UM25C_ADDRESS="00:16:A5:00:12:8A"
+
 def measure_power(um25c_device: UM25C, seconds=10):
-    data = um25c_device.query()
+    data = []
+    t_end = time.time() + seconds
+    while time.time() < t_end:
+        data.append(um25c_device.query())
     return data
 
 
@@ -27,10 +32,22 @@ if __name__ == "__main__":
 
     os.system('adb root')
     os.system('adb shell setenforce 0')
+
+    # Load Application
     adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
     adb_device = adb_client.device()
     apk_manager = ApkManager(adb_device=adb_device, apk_filepath="")
+
+    # Connect to bluetooth device
+    um25c = UM25C(UM25C_ADDRESS)
+
+    # Start experiment loop
     apk_manager.start()
+    time.sleep(5)
+    data = measure_power(um25c_device=um25c)
+    for d in data:
+        print(d)
+
     exit()
 
 

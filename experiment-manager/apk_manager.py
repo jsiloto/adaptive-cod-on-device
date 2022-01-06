@@ -29,6 +29,12 @@ class ApkManager():
     def install(self):
         self.adb.install(self.apk)
 
+    def clear_logs(self):
+        self.adb.shell("logcat --clear")
+
+    def parse_outpus(self):
+        a = self.adb.shell("logcat -d -e \"ExperimentOutput\"")
+
 
 # def get_apk(apk_file):
 #     apk_file = "/data/workspace/unicamp/adaptive-cod-on-device/android-device/app/build/outputs/apk/debug/app-debug.apk"

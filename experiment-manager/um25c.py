@@ -30,7 +30,7 @@ class UM25C(object):
         data["Watts"] = struct.unpack(">I", d[6: 9 + 1])[0] / 1000.0  # watts
         data["temp_C"] = struct.unpack(">h", d[10: 11 + 1])[0]  # temp in C
         data["temp_F"] = struct.unpack(">h", d[12: 13 + 1])[0]  # temp in F
-
+        data["group"] = struct.unpack(">h", d[14: 15 + 1])[0]  # measurement group
         utc_dt = datetime.datetime.now(datetime.timezone.utc)  # UTC time
         dt = utc_dt.astimezone()  # local time
         data["time"] = dt
