@@ -13,14 +13,13 @@ class ApkManager():
 
     def start(self, model="", url="", alpha=1.0):
         self.stop()
-
         self.adb.shell("pm grant {}/ android.permission.READ_EXTERNAL_STORAGE"
                        .format(self.application_name))
 
         commandline = "am start -n {}/.ExperimentActivity".format(self.application_name)
-        commandline += " -e model \"{}\"".format(model)
-        commandline += " -e url \"{}\"".format(url)
-        commandline += " -ef alpha \"{}\"".format(alpha)
+        commandline += " --es model \"{}\"".format(model)
+        commandline += " --es url \"{}\"".format(url)
+        commandline += " --ef alpha \"{}\"".format(alpha)
         self.adb.shell(commandline)
 
     def stop(self):
@@ -32,8 +31,9 @@ class ApkManager():
     def clear_logs(self):
         self.adb.shell("logcat --clear")
 
-    def parse_outpus(self):
+    def parse_outputs(self):
         a = self.adb.shell("logcat -d -e \"ExperimentOutput\"")
+        return a
 
 
 # def get_apk(apk_file):

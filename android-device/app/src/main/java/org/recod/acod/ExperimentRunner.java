@@ -28,6 +28,7 @@ public class ExperimentRunner {
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
                 QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
                 apiHandler.postSplitTensor(qx, null);
+                System.out.println(String.format("ExperimentOutput: %d images", i+1));
                 stream.close();
             } catch (IOException e) {
                 System.out.println("Error processing tensor");

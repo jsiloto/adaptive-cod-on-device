@@ -1,6 +1,7 @@
 package org.recod.acod;
 
 import android.graphics.Bitmap;
+import android.os.SystemClock;
 
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
@@ -29,6 +30,7 @@ public class PytorchModuleWrapper {
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
                 bitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
         if(dummy){
+            SystemClock.sleep(500);
             outputTensor = inputTensor;
         }
         if (!dummy) {
