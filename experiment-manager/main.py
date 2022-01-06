@@ -91,12 +91,13 @@ if __name__ == "__main__":
     experiment_data["joules2"] = 3.6 * power_mWh
     experiment_data["joules2_per_image"] = 3.6 * power_mWh / num_images
     experiment_data["num_images"] = num_images
+    experiment_data["compute_latency"] = args.seconds/num_images
     print(experiment_data)
 
     path = './experiment-results'
     os.makedirs(path, exist_ok=True)
 
-    experiment_name = path + "/" + "{}_{:3d}_wifi_{}".format(args.model, int(100 * args.alpha), not args.url)
+    experiment_name = path + "/" + "{}_{:03d}_wifi_{}".format(args.model, int(100 * args.alpha), not (not args.url))
     with open(experiment_name + ".json", 'w') as f:
         json.dump(experiment_data, f)
 
