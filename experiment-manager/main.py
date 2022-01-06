@@ -21,7 +21,8 @@ import os
 import re
 import json
 
-UM25C_ADDRESS="00:16:A5:00:12:8A"
+UM25C_ADDRESS = "00:16:A5:00:12:8A"
+
 
 def measure_power(um25c_device: UM25C, seconds=10):
     data = []
@@ -30,6 +31,7 @@ def measure_power(um25c_device: UM25C, seconds=10):
         data.append(um25c_device.query())
     return data
 
+
 def get_argparser():
     argparser = argparse.ArgumentParser(description='Experiment Runner')
     argparser.add_argument('--model', default="", type=str)
@@ -37,7 +39,6 @@ def get_argparser():
     argparser.add_argument('--alpha', default=1.0, type=float)
     argparser.add_argument('--seconds', default=60, type=int)
     return argparser
-
 
 
 if __name__ == "__main__":
@@ -66,7 +67,6 @@ if __name__ == "__main__":
     num_images = int(x[-1]) - int(x[0])
     print(num_images)
 
-
     # Process data
     group = data[0]["group"]
     t = [d['time'] for d in data]
@@ -75,31 +75,30 @@ if __name__ == "__main__":
 
     power_mWh = p[-1] - p[0]
     joules = 0.0
-    for i in range(len(t)-1):
+    for i in range(len(t) - 1):
         joules += w[i + 1] * (t[i + 1] - t[i]).total_seconds()
 
-    joule_per_image = joules/num_images
+    joule_per_image = joules / num_images
     print("Joules1 Total", joules)
     print("Joules1/image", joule_per_image)
-    joule_per_image = 3.6*power_mWh / num_images
-    print("Joules2 Total", 3.6*power_mWh)
+    joule_per_image = 3.6 * power_mWh / num_images
+    print("Joules2 Total", 3.6 * power_mWh)
     print("Joules2/image", joule_per_image)
-
 
     experiment_data = vars(args)
     experiment_data["joules1"] = joules
     experiment_data["joules1_per_image"] = joule_per_image
-    experiment_data["joules2"] = 3.6*power_mWh
-    experiment_data["joules2_per_image"] = 3.6*power_mWh / num_images
+    experiment_data["joules2"] = 3.6 * power_mWh
+    experiment_data["joules2_per_image"] = 3.6 * power_mWh / num_images
     experiment_data["num_images"] = num_images
     print(experiment_data)
 
+    path = './experiment-results'
+    os.makedirs(path, exist_ok=True)
 
-    experiment_name = "{}_{:3d}_wifi_{}".format(args.model, int(100*args.alpha), not args.url)
-    with open(experiment_name+".json", 'w') as f:
+    experiment_name = path + "/" + "{}_{:3d}_wifi_{}".format(args.model, int(100 * args.alpha), not args.url)
+    with open(experiment_name + ".json", 'w') as f:
         json.dump(experiment_data, f)
 
-
     plt.plot(t, w)
-    plt.savefig(experiment_name+".png")
-
+    plt.savefig(experiment_name + ".png")
