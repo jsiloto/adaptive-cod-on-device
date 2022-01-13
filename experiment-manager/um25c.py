@@ -1,6 +1,8 @@
 from bluetooth import *
 import datetime
 
+# sudo systemctl start bluetooth
+# echo "power on" | bluetoothctl
 
 
 class UM25C(object):
