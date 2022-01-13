@@ -30,7 +30,22 @@ def measure_power(um25c_device: UM25C, seconds=10):
     return data
 
 
-def experiment(seconds: int, model: str, alpha: float, url: str):
+def experiment(seconds: int, model: str, alpha: float, url: str, norepeat: bool):
+    # Check if experiment exists
+    path = './experiment-results'
+    os.makedirs(path, exist_ok=True)
+    experiment_name = path + "/" + "{}s_{}_{:03d}_wifi_{}"\
+        .format(seconds, model, int(100 * alpha), not (not url))
+
+    print(experiment_name)
+    print(os.path.exists(experiment_name+".json"))
+    if norepeat and os.path.exists(experiment_name+".json"):
+        exit(0)
+
+
+    ############### START ##################################
+
+
     os.system('adb root')
     os.system('adb shell setenforce 0')
 
@@ -78,10 +93,6 @@ def experiment(seconds: int, model: str, alpha: float, url: str):
         "num_images": num_images,
         "compute_latency": seconds / num_images}
 
-    path = './experiment-results'
-    os.makedirs(path, exist_ok=True)
-
-    experiment_name = path + "/" + "{}_{:03d}_wifi_{}".format(model, int(100 * alpha), not (not url))
     with open(experiment_name + ".json", 'w') as f:
         json.dump(experiment_data, f)
 
@@ -95,9 +106,10 @@ def get_argparser():
     argparser.add_argument('--url', default="", type=str)
     argparser.add_argument('--alpha', default=1.0, type=float)
     argparser.add_argument('--seconds', default=60, type=int)
+    argparser.add_argument('-no-repeat', action='store_true')
     return argparser
 
 
 if __name__ == "__main__":
     args = get_argparser().parse_args()
-    experiment(args.seconds, args.model, args.alpha, args.url)
+    experiment(args.seconds, args.model, args.alpha, args.url, args.no_repeat)
