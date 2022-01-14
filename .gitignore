@@ -6,6 +6,7 @@ server/temp/
 *.jpg
 *.png
 android-device/.gradle/
+experiment-manager/experiment-results/
 
 
 # Byte-compiled / optimized / DLL files

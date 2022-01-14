@@ -131,6 +131,15 @@ public class MainActivity extends AppCompatActivity implements Runnable {
             }
         });
 
+        final Button buttonExperiment = findViewById(R.id.experimentButton);
+        buttonExperiment.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final Intent intent = new Intent(MainActivity.this, ExperimentActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
 
         mButtonDetect = findViewById(R.id.detectButton);

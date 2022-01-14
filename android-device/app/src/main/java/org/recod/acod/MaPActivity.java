@@ -56,6 +56,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         moduleWrapper = new PytorchModuleWrapper(modulePath);
 
         thread = new Thread(MaPActivity.this);
+        thread.setPriority(Thread.MAX_PRIORITY);
         thread.start();
     }
 
@@ -100,7 +101,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
 
         File[] imageList = Dataset.getInstance().getFileList();
         int max_images = imageList.length;
-//        max_images = 10;
+        max_images = 15;
 
 
         FrameTracker frameTracker = new FrameTracker();
@@ -143,7 +144,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             String results = apiHandler.getServerMAP();
             JsonObject jsonObject =  JsonParser.parseString(results).getAsJsonObject();
             jsonObject.add("performance", JsonParser.parseString(String.valueOf(frameTracker)));
-            apiHandler.postData(jsonObject.toString(), String.format("device_%3d.json", (int) (alpha * 100)));
+//            apiHandler.postData(jsonObject.toString(), String.format("device_%3d.json", (int) (alpha * 100)));
         } catch (Exception e) {
             System.out.println("Error processing results");
             e.printStackTrace();
