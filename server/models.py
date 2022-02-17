@@ -22,8 +22,8 @@ def get_models():
     return full_model, decoder_model
 
 def get_decoder():
-    device = torch.device("cuda")
-    decoder_model = torch.jit.load('./assets/effd2_decoder.ptl', map_location=torch.device("cuda:0"))
+    device = torch.device("cpu")
+    decoder_model = torch.jit.load('./assets/effd2_decoder.ptl')
     decoder_model = AutoShapeDecoder(decoder_model)
     decoder_model.stride = torch.tensor([8., 16., 32.])
     decoder_model.names = constants.class_names

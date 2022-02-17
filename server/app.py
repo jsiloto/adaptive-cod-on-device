@@ -101,8 +101,8 @@ def split():
 
     x = request_parser.dequantized_data
     # print(x)
-    results = decoder_model(x.to('cuda'), request_parser.w, request_parser.h)
-    # results = decoder_model(x, request_parser.w, request_parser.h)
+    # results = decoder_model(x.to('cuda'), request_parser.w, request_parser.h)
+    results = decoder_model(x, request_parser.w, request_parser.h)
     detections = pred2det(results.pred[0],
                           request_parser.image_id,
                           request_parser.w,
