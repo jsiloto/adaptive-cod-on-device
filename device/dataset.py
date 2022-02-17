@@ -21,6 +21,7 @@ def coco_image_list(subval=False):
         set = "subval2017"
 
     image_ids = os.listdir("../resource/dataset/coco2017/"+set)
+    image_ids.sort()
     for image_id in image_ids:
         image_path = os.path.join("../resource/dataset/coco2017/"+set+"/", image_id)
         image_list.append((image_path, image_id))

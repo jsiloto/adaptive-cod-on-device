@@ -67,6 +67,7 @@ def get_result():
 @app.route('/data/<filename>', methods=['POST'])
 def post_data(filename=None):
     data = json.loads(request.data)
+    os.makedirs("./temp/data/", exist_ok=True)
     full_path = os.path.join("./temp/data/", filename)
     with open(full_path, "w+") as f:
         json.dump(data, f)
@@ -80,8 +81,8 @@ def show_index():
     return render_template("index.html",
                            input_image=ground_truth_filename,
                            split_result=prediction_filename,
-                           output_time=str(elapsed_test),
-                           reference_time=str(elapsed_reference))
+                           output_time="",
+                           reference_time="")
 
 
 @app.route(endpoint_filename)
@@ -100,14 +101,16 @@ def split():
     # print("#########################")
 
     x = request_parser.dequantized_data
+    # print(x)
     results = decoder_model(x, request_parser.w, request_parser.h)
     detections = pred2det(results.pred[0],
                           request_parser.image_id,
                           request_parser.w,
                           request_parser.h)
 
-    # image_manager.update_ground_truth(request_parser.image_id)
-    # image_manager.update_prediction(request_parser.image_id, results)
+    print(detections)
+    image_manager.update_ground_truth(request_parser.image_id)
+    image_manager.update_prediction(request_parser.image_id, results)
     global_results.update(detections)
 
     response = make_response(detection2response(detections), 200)

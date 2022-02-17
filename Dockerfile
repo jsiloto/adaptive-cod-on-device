@@ -1,16 +1,7 @@
-#FROM pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
-#FROM pytorch/pytorch:1.9.0-cuda10.2-cudnn7-runtime
-#FROM pytorch/pytorch:1.7.1-cuda11.0-cudnn8-runtime
-#FROM pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
+FROM nvidia/cuda:11.3.1-runtime-ubuntu20.04
 
-FROM nvidia/cuda:11.4.0-runtime-ubuntu20.04
-
-WORKDIR /app
-
-# Setting DEBIAN_FRONTEND=noninteractive allows installation
-# of some packages to complete without user input.
-# Install Python3.8
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y python3.8 python3-pip \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y python3.8 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
@@ -24,15 +15,36 @@ RUN apt-get update && \
     sudo \
     vim
 
-RUN pip install torch
-RUN pip install torchvision
+# As per installation instructions @ https://pytorch.org/
+RUN pip3 install torch==1.10.1+cu113 \
+                  torchvision==0.11.2+cu113 \
+                  torchaudio==0.10.1+cu113 \
+                  -f https://download.pytorch.org/whl/cu113/torch_stable.html
 
 
-#RUN conda install -y jupyter torchvision tensorboard pip matplotlib scipy scikit-learn
-RUN pip install jupyter tensorboard pip matplotlib scipy scikit-learn
-RUN pip install tensorboardX gdown pycocotools pipenv ptflops wget pandas
-RUN pip install pycocotools numpy opencv-python tqdm tensorboard tensorboardX pyyaml webcolors
-RUN pip install wandb
-RUN pip install gevent gunicorn flask
-RUN pip install gradio seaborn
-RUN pip install jsonlines
+RUN pip install tensorboardX \
+    gdown pycocotools pipenv \
+    ptflops wget pandas \
+    pycocotools numpy opencv-python \
+    tqdm tensorboard tensorboardX \
+    pyyaml webcolors jsonlines \
+    gradio seaborn gevent gunicorn flask \
+    wandb pyyaml webcolors tensorboard matplotlib \
+    scipy scikit-learn jupyter torch_tb_profiler
+
+ARG UID
+ARG GID
+ARG USER
+ARG GROUP
+RUN groupadd -g $GID $GROUP
+RUN useradd -r -s /bin/false -g $GROUP -G sudo -u $UID $USER
+RUN mkdir /home/$USER
+RUN chmod -R 777 /home/$USER
+
+CMD /bin/bash
+
+
+#COPY requirements.txt ./requirements.txt
+#RUN pip install -r requirements.txt
+
+

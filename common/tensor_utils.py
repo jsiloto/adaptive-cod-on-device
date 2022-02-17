@@ -1,11 +1,24 @@
 from collections import namedtuple
 
-QuantizedTensor = namedtuple('QuantizedTensor', ['tensor', 'scale', 'zero_point'])
+import torch
 
+QuantizedTensor = namedtuple('QuantizedTensor', ['tensor', 'scale', 'zero_point'])
+import re
+import inspect
+
+
+#
 
 # Referred to https://github.com/eladhoffer/utils.pytorch/blob/master/quantize.py
 #  and http://openaccess.thecvf.com/content_cvpr_2018/papers/Jacob_Quantization_and_Training_CVPR_2018_paper.pdf
 def quantize_tensor(x, num_bits=8):
+    if x.dtype == torch.quint8:
+        zero_point = x.q_zero_point()
+        scale = x.q_scale()
+        qx = torch.int_repr(x)
+        print("here")
+        return QuantizedTensor(tensor=qx, scale=scale, zero_point=zero_point)
+
     qmin = 0.0
     qmax = 2.0 ** num_bits - 1.0
     min_val, max_val = x.min(), x.max()

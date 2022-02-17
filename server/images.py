@@ -13,7 +13,7 @@ from yolov5.models.common import Detections
 
 
 safe_mode = 0o777  # LOL
-dataset_path = "/workspace/resource/dataset/coco2017/val2017/"
+dataset_path = "/work/resource/dataset/coco2017/val2017/"
 
 class ImageManager:
     def __init__(self, ground_truth_image, prediction_image):

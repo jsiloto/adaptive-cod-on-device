@@ -10,18 +10,17 @@ import sys
 sys.path.insert(0, '../common')
 from tensor_utils import quantize_tensor
 
-
-
-
 class API:
     def __init__(self, base_url):
         self.base_url = base_url
         self.encoder_model = torch.jit.load('../server/assets/effd2_encoder.ptl')
         self.encoder_model.eval()
         self.encoder_model.set_width(1.0)
+        self.width = 1.0
 
     def set_width(self, width):
         self.encoder_model.set_width(width)
+        self.width = width
 
     def delete_results(self):
         url = urljoin(self.base_url, "map")
@@ -31,6 +30,7 @@ class API:
     def get_results(self):
         url = urljoin(self.base_url, "map")
         res = requests.get(url=url)
+        print(res.content)
         return json.loads(res.content)
 
     def post_data(self, filename, json_data):
@@ -43,17 +43,24 @@ class API:
         w = image.size[0]
         h = image.size[1]
 
+
         with torch.no_grad():
             x = tfunc.to_tensor(image)
             x = x.unsqueeze(0)
             x = self.encoder_model(x) # approx 200ms
 
+        _, ct, wt, ht = x.shape
+        # print(ct, wt, ht)
+        # print(x)
         x = quantize_tensor(x, num_bits=8)
+        # print(x)
         res = requests.post(url=url,
                             data=x.tensor.numpy().astype(np.uint8).tobytes(),
                             headers={'Content-Type': 'application/octet-stream',
                                      "image_id": image_id,
                                      "w": str(w), "h": str(h),
+                                     "ct": str(ct), "wt": str(wt), "ht": str(ht),
+                                     "width": str(self.width),
                                      "scale": str(float(x.scale)),
                                      "zero_point": str(float(x.zero_point))})
 
