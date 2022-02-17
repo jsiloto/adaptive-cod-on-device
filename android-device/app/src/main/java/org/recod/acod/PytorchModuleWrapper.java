@@ -12,6 +12,7 @@ import org.pytorch.torchvision.TensorImageUtils;
 public class PytorchModuleWrapper {
     Module mModule;
     boolean dummy = false;
+    float width = 1.0f;
 
     public PytorchModuleWrapper(String modulePath) {
         mModule = LiteModuleLoader.load(modulePath);
@@ -40,11 +41,13 @@ public class PytorchModuleWrapper {
         QuantizedTensor qx = new QuantizedTensor(outputTensor, 8, imageId);
         qx.originalWidth = bitmap.getWidth();
         qx.originalHeight = bitmap.getHeight();
+        qx.alpha = this.width;
         return qx;
     }
 
     public void setWidth(float width) {
         if(!dummy){
+            this.width = width;
             mModule.runMethod("set_width", IValue.from(width));
         }
     }

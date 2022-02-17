@@ -2,7 +2,7 @@ package org.recod.acod;
 
 
 public class ApiHandler {
-    private String url = "http://192.168.1.102:5000/";
+    private String url = "http://192.168.15.172:5000/";
     private boolean dummy = false;
 
     ApiHandler() {

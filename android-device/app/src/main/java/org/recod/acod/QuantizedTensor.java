@@ -10,6 +10,8 @@ public class QuantizedTensor {
     public byte [] qx;
     public int originalWidth = 0;
     public int originalHeight = 0;
+    public int c, w, h;
+    public float alpha = 1.0f;
     public String imageId = "";
 
 
@@ -28,6 +30,10 @@ public class QuantizedTensor {
 
     public QuantizedTensor(final Tensor outputTensor, int num_bits, String imageId){
         this.imageId = imageId;
+        this.c = (int) outputTensor.shape()[1];
+        this.w = (int) outputTensor.shape()[2];
+        this.h = (int) outputTensor.shape()[3];
+
         float [] tensor = outputTensor.getDataAsFloatArray();
         num_bits = 8;
         float qmin = 0.0f;

@@ -22,10 +22,16 @@ def get_models():
     return full_model, decoder_model
 
 def get_decoder():
-    decoder_model = torch.jit.load('./assets/effd2_decoder.ptl')
+    device = torch.device("cuda")
+    decoder_model = torch.jit.load('./assets/effd2_decoder.ptl', map_location=torch.device("cuda:0"))
     decoder_model = AutoShapeDecoder(decoder_model)
     decoder_model.stride = torch.tensor([8., 16., 32.])
     decoder_model.names = constants.class_names
+    decoder_model.to(device)
+
+    # Warm up model
+    a = torch.rand((1, 12, 48, 48), device=device)
+    decoder_model(a, 768, 768)
     return decoder_model
 
 
@@ -54,6 +60,7 @@ def detect(im, model, image_id, w, h):
 
 
 def pred2det(pred, image_id, w, h):
+    pred = pred.cpu()
     detections = []
     for p in pred:
         d = {

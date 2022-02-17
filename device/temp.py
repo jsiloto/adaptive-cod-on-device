@@ -26,7 +26,7 @@ def random_image_list(num_images):
 
 
 
-encoder_model = torch.jit.load('../server/effd2_encoder.ptl')
+encoder_model = torch.jit.load('../server/assets/effd2_encoder.ptl')
 encoder_model.eval()
 encoder_model.set_width(0.25)
 
@@ -36,7 +36,7 @@ with torch.no_grad():
         start = time.time()
         encoder_model.set_width(alpha)
         for image, image_id in image_list:
-
+            print(image_id)
             w = image.size[0]
             h = image.size[1]
             image = image.resize((640, 640))

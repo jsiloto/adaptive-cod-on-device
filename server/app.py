@@ -39,7 +39,6 @@ results_filename = os.path.join(app.config['UPLOAD_FOLDER'], "data.jsonl")
 
 decoder_model = get_decoder()
 
-
 # Global State
 global_results = ResultManager(results_filename)
 image_manager = ImageManager(ground_truth_filename, prediction_filename)
@@ -102,15 +101,15 @@ def split():
 
     x = request_parser.dequantized_data
     # print(x)
-    results = decoder_model(x, request_parser.w, request_parser.h)
+    results = decoder_model(x.to('cuda'), request_parser.w, request_parser.h)
+    # results = decoder_model(x, request_parser.w, request_parser.h)
     detections = pred2det(results.pred[0],
                           request_parser.image_id,
                           request_parser.w,
                           request_parser.h)
 
-    print(detections)
-    image_manager.update_ground_truth(request_parser.image_id)
-    image_manager.update_prediction(request_parser.image_id, results)
+    # image_manager.update_ground_truth(request_parser.image_id)
+    # image_manager.update_prediction(request_parser.image_id, results)
     global_results.update(detections)
 
     response = make_response(detection2response(detections), 200)

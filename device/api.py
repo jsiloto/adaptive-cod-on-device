@@ -51,7 +51,7 @@ class API:
 
         _, ct, wt, ht = x.shape
         # print(ct, wt, ht)
-        # print(x)
+        # print(x.shape)
         x = quantize_tensor(x, num_bits=8)
         # print(x)
         res = requests.post(url=url,
