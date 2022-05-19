@@ -25,12 +25,13 @@ android {
 
     defaultConfig {
         applicationId "org.recod.acod"
-        minSdkVersion 28
+        minSdkVersion 30
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
@@ -39,6 +40,16 @@ android {
 //        }
         release {
             minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.debug
+        }
+    }
+    signingConfigs {
+        garbage_key {
+            keyAlias 'android'
+            keyPassword 'android'
+            storeFile file('/home/jsiloto/.android/debug.keystore')
+            storePassword 'android'
         }
     }
     compileOptions {
@@ -69,7 +80,7 @@ dependencies {
     implementation "androidx.camera:camera-camera2:$camerax_version"
 
     implementation 'org.pytorch:pytorch_android_lite:1.10.0'
-    implementation('org.pytorch:pytorch_android_torchvision:1.10.0'){
+    implementation('org.pytorch:pytorch_android_torchvision:1.10.0') {
         exclude group: 'org.pytorch'
         exclude module: 'jetified-pytorch_android-1.10.0-runtime'
     }

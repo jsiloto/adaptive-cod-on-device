@@ -11,9 +11,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import org.pytorch.Module;
 
 import java.io.File;
@@ -38,6 +35,15 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Dataset.LoadFromDisk(getApplicationContext());
+        Dataset dataset = Dataset.getInstance();
+        while (!dataset.isReady()) {
+            System.out.println("Waiting obb mount. Are you sure the file is there?");
+        }
+        ; // Wait obb load
+
+
         setContentView(R.layout.activity_map);
         mImageText = findViewById(R.id.textCurrentImage);
         mRoundTripText = findViewById(R.id.textRoundTrip);
@@ -45,7 +51,7 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
         chronometer = findViewById(R.id.chronometer100);
 
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"MyApp::MyWakelockTag");
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakelockTag");
 
         try {
             modulePath = MainActivity.assetFilePath(getApplicationContext(), "effd2_encoder.ptl");
@@ -94,14 +100,23 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
     }
 
     private void run_at_alpha(float alpha, ProgressBar progressBar, Chronometer chronometer) {
-        apiHandler.clearServerMAP();
+//        apiHandler.clearServerMAP();
         moduleWrapper.setWidth(alpha);
-        chronometer.setBase(SystemClock.elapsedRealtime());
-        chronometer.start();
 
         File[] imageList = Dataset.getInstance().getFileList();
         int max_images = imageList.length;
-        max_images = 15;
+        max_images = 25;
+
+        /******************** Warmup ****************/
+        try {
+            String imageId = imageList[0].getName();
+            FileInputStream stream = new FileInputStream(imageList[0]);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream);
+            QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
+        } catch (IOException e) {
+            System.out.println("Error processing tensor");
+            e.printStackTrace();
+        }
 
 
         FrameTracker frameTracker = new FrameTracker();
@@ -112,10 +127,12 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
             }
         }
 
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.start();
         for (int i = 0; i < max_images; i++) {
             String imageId = imageList[i].getName();
             frameTracker.RegisterNewFrame();
-            mImageText.setText(String.format("%s [%d/%d]",imageId, i, max_images));
+            mImageText.setText(String.format("%s [%d/%d]", imageId, i, max_images));
             mRoundTripText.setText(frameTracker.statistics());
             try {
                 FileInputStream stream = new FileInputStream(imageList[i]);
@@ -125,29 +142,29 @@ public class MaPActivity extends AppCompatActivity implements Runnable {
                 QuantizedTensor qx = moduleWrapper.run(bitmap, imageId);
 
                 frameTracker.RegisterRequest();
-                apiHandler.postSplitTensor(qx, new TrackerCallback());
+//                apiHandler.postSplitTensor(qx, new TrackerCallback());
                 stream.close();
+
+                progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
             } catch (IOException e) {
                 System.out.println("Error processing tensor");
                 e.printStackTrace();
             }
-            progressBar.setProgress((i + 1) * (progressBar.getMax() - progressBar.getMin()) / max_images);
-
         }
 
-
-        try {
-            while(!frameTracker.isDone()){
-                System.out.println("Waiting all requests to resolve");
-            }
-            chronometer.stop();
-            String results = apiHandler.getServerMAP();
-            JsonObject jsonObject =  JsonParser.parseString(results).getAsJsonObject();
-            jsonObject.add("performance", JsonParser.parseString(String.valueOf(frameTracker)));
-//            apiHandler.postData(jsonObject.toString(), String.format("device_%3d.json", (int) (alpha * 100)));
-        } catch (Exception e) {
-            System.out.println("Error processing results");
-            e.printStackTrace();
-        }
+        chronometer.stop();
+//        try {
+//            while (!frameTracker.isDone()) {
+//                System.out.println("Waiting all requests to resolve");
+//            }
+//            chronometer.stop();
+//            String results = apiHandler.getServerMAP();
+//            JsonObject jsonObject = JsonParser.parseString(results).getAsJsonObject();
+//            jsonObject.add("performance", JsonParser.parseString(String.valueOf(frameTracker)));
+////            apiHandler.postData(jsonObject.toString(), String.format("device_%3d.json", (int) (alpha * 100)));
+//        } catch (Exception e) {
+//            System.out.println("Error processing results");
+//            e.printStackTrace();
+//        }
     }
 }

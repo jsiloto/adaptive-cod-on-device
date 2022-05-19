@@ -20,7 +20,7 @@ public class PytorchModuleWrapper {
 
     public PytorchModuleWrapper(String modulePath, boolean dummy) {
         this.dummy = dummy;
-        if(!dummy){
+        if (!dummy) {
             mModule = LiteModuleLoader.load(modulePath);
         }
     }
@@ -30,7 +30,7 @@ public class PytorchModuleWrapper {
         Tensor outputTensor = null;
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
                 bitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
-        if(dummy){
+        if (dummy) {
             SystemClock.sleep(500);
             outputTensor = inputTensor;
         }
@@ -46,9 +46,16 @@ public class PytorchModuleWrapper {
     }
 
     public void setWidth(float width) {
-        if(!dummy){
+        if (!dummy) {
             this.width = width;
-            mModule.runMethod("set_width", IValue.from(width));
+            try {
+                //            mModule.runMethod("set_config", IValue.from(width), IValue.from(width), IValue.from((int)(4*width)));
+//                mModule.runMethod("set_width", IValue.from(0.25));
+                int i = 1 + (int) ((width - 0.25) * 12);
+                i = 1 +(int)((width-0.25)*4);
+                mModule.runMethod("set_size", IValue.from(i));
+            } catch (Exception e) {
+            }
         }
     }
 }

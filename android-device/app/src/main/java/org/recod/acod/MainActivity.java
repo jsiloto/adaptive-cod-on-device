@@ -227,12 +227,12 @@ public class MainActivity extends AppCompatActivity implements Runnable {
         // TODO: Document differences in preprocessing from PIL to TensorImageUtils
 //        Bitmap resizedBitmap = Bitmap.createScaledBitmap(mBitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(mBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
-        mModule.runMethod("set_width", IValue.from(1.0f));
+        mModule.runMethod("set_config", IValue.from(1.0f), IValue.from(1.0f), IValue.from(1));
         IValue outputTuple = mModule.forward(IValue.from(inputTensor));
         final Tensor outputTensor = outputTuple.toTensor();
 
 
-        mModule.runMethod("set_width", IValue.from(0.5f));
+        mModule.runMethod("set_config", IValue.from(0.5f), IValue.from(0.5f), IValue.from(1));
         outputTuple = mModule.forward(IValue.from(inputTensor));
         final Tensor outputTensor2 = outputTuple.toTensor();
 
