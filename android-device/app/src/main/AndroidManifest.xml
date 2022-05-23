@@ -29,19 +29,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.recod.acod.ObjectDetectionActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name="org.recod.acod.MaPActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name="org.recod.acod.ExperimentActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">

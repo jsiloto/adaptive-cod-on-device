@@ -29,7 +29,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         String url = "";
         String model = "";
         String modelPath =  "";
-        float alpha = 1.0f;
+        String mode = "1.0f";
         boolean useDummyModel = false;
         boolean useDummyWifi = false;
 
@@ -38,7 +38,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         if (extras != null) {
             url = extras.getString("url", url);
             model = extras.getString("model", model);
-            alpha = extras.getFloat("alpha", alpha);
+            mode = extras.getString("mode", mode);
         }
         useDummyModel = model.isEmpty();
         useDummyWifi = url.isEmpty();
@@ -46,7 +46,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         // Acquire User Interface
         setContentView(R.layout.activity_experiment);
         textConfigs = findViewById(R.id.textConfigs);
-        textConfigs.setText(String.format("model:%s, alpha=%f, server=%s",model, alpha, url));
+        textConfigs.setText(String.format("model:%s, mode=%f, server=%s",model, mode, url));
 
         // Load Experiment Assets
         try {
@@ -54,7 +54,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
                 modelPath = Helper.assetFilePath(this.getApplicationContext(), model);
             }
             moduleWrapper = new PytorchModuleWrapper(modelPath, useDummyModel);
-            moduleWrapper.setWidth(alpha);
+            moduleWrapper.setMode(mode);
             apiHandler = new ApiHandler(url, useDummyWifi);
             Dataset.LoadFromDisk(this.getApplicationContext());
             dataset = Dataset.getInstance();

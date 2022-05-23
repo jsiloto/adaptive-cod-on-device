@@ -12,7 +12,7 @@ import org.pytorch.torchvision.TensorImageUtils;
 public class PytorchModuleWrapper {
     Module mModule;
     boolean dummy = false;
-    float width = 1.0f;
+    String mode = "1.0f";
 
     public PytorchModuleWrapper(String modulePath) {
         mModule = LiteModuleLoader.load(modulePath);
@@ -41,19 +41,19 @@ public class PytorchModuleWrapper {
         QuantizedTensor qx = new QuantizedTensor(outputTensor, 8, imageId);
         qx.originalWidth = bitmap.getWidth();
         qx.originalHeight = bitmap.getHeight();
-        qx.alpha = this.width;
+        qx.mode = this.mode;
         return qx;
     }
 
-    public void setWidth(float width) {
+    public void setMode(String mode) {
         if (!dummy) {
-            this.width = width;
+            this.mode = mode;
             try {
                 //            mModule.runMethod("set_config", IValue.from(width), IValue.from(width), IValue.from((int)(4*width)));
 //                mModule.runMethod("set_width", IValue.from(0.25));
-                int i = 1 + (int) ((width - 0.25) * 12);
-                i = 1 +(int)((width-0.25)*4);
-                mModule.runMethod("set_size", IValue.from(i));
+//                int i = 1 + (int) ((width - 0.25) * 12);
+//                i = 1 +(int)((mode-0.25)*4);
+                mModule.runMethod("set_mode", IValue.from(mode));
             } catch (Exception e) {
             }
         }

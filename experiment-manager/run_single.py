@@ -30,12 +30,12 @@ def measure_power(um25c_device: UM25C, seconds=10):
     return data
 
 
-def experiment(seconds: int, model: str, alpha: float, url: str, norepeat: bool):
+def experiment(seconds: int, model: str, mode: float, url: str, norepeat: bool):
     # Check if experiment exists
     path = './experiment-results'
     os.makedirs(path, exist_ok=True)
     experiment_name = path + "/" + "{}s_{}_{:03d}_wifi_{}"\
-        .format(seconds, model, int(100 * alpha), not (not url))
+        .format(seconds, model, int(100 * mode), not (not url))
 
     print(experiment_name)
     print(os.path.exists(experiment_name+".json"))
@@ -60,7 +60,7 @@ def experiment(seconds: int, model: str, alpha: float, url: str, norepeat: bool)
     um25c = UM25C(UM25C_ADDRESS)
 
     # Start experiment loop
-    apk_manager.start(model=model, alpha=alpha, url=url)
+    apk_manager.start(model=model, mode=mode, url=url)
     time.sleep(3)  # Warmup
     print("Experiment Start!")
     apk_manager.clear_logs()
@@ -83,7 +83,7 @@ def experiment(seconds: int, model: str, alpha: float, url: str, norepeat: bool)
 
     experiment_data = {
         "model": model,
-        "alpha": alpha,
+        "mode": mode,
         "seconds": seconds,
         "url": url,
         "joules1": joules,
@@ -104,7 +104,7 @@ def get_argparser():
     argparser = argparse.ArgumentParser(description='Experiment Runner')
     argparser.add_argument('--model', default="", type=str)
     argparser.add_argument('--url', default="", type=str)
-    argparser.add_argument('--alpha', default=1.0, type=float)
+    argparser.add_argument('--mode', default=1.0, type=float)
     argparser.add_argument('--seconds', default=60, type=int)
     argparser.add_argument('-no-repeat', action='store_true')
     return argparser
@@ -112,4 +112,4 @@ def get_argparser():
 
 if __name__ == "__main__":
     args = get_argparser().parse_args()
-    experiment(args.seconds, args.model, args.alpha, args.url, args.no_repeat)
+    experiment(args.seconds, args.model, args.mode, args.url, args.no_repeat)

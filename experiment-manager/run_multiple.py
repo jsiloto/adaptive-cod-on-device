@@ -12,11 +12,11 @@ def get_argparser():
 
 
 # Using Subprocess instead of single thread to isolate bluetooth errors
-def experiment(seconds, model, alpha, url, norepeat, retry=True):
+def experiment(seconds, model, mode, url, norepeat, retry=True):
     while True:
         run_string = "python3 run_single.py --seconds {}".format(seconds)
         if len(model)>0:
-            run_string += " --model {} --alpha {}".format(model, alpha)
+            run_string += " --model {} --mode {}".format(model, mode)
         if len(url) > 0:
             run_string += " --url {}".format(url)
         if norepeat:
@@ -38,11 +38,11 @@ if __name__ == "__main__":
         config = json.load(f, object_hook=lambda d: SimpleNamespace(**d))
 
     # Run base Experiment
-    experiment(seconds=config.seconds, model="", alpha=1.0, url="", norepeat=args.no_repeat)
+    experiment(seconds=config.seconds, model="", mode=1.0, url="", norepeat=args.no_repeat)
 
     all_configs = list(itertools.product([config.seconds],
                                          config.model,
-                                         config.alpha,
+                                         config.mode,
                                          ["", config.url],
                                          [args.no_repeat]))
     for config in all_configs:

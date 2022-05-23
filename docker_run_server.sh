@@ -9,7 +9,7 @@ COMMAND="docker run --rm -it \
             --userns=host  \
             -p 5000:5000 \
             --name juliano.siloto.acod-server  \
-            juliano.siloto/adaptive_cod  ./setup.sh"
+            juliano.siloto/adaptive_cod"
 
 #
 #COMMAND="docker run --gpus device=0 --rm -it \
