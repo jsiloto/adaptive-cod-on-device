@@ -40,7 +40,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
             model = extras.getString("model", model);
             mode = extras.getString("mode", mode);
         }
-        useDummyModel = model.isEmpty();
+        useDummyModel = model.isEmpty() || model.equals("dummy");
         useDummyWifi = url.isEmpty();
 
         // Acquire User Interface

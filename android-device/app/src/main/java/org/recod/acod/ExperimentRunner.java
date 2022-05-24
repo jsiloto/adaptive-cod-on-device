@@ -22,6 +22,10 @@ public class ExperimentRunner {
 
     public void run() {
         for (int i = 0; i < max_images; i++) {
+            final Runtime runtime = Runtime.getRuntime();
+            final long usedMemInKB=(runtime.totalMemory() - runtime.freeMemory()) / 1024L;
+            System.out.println(usedMemInKB);
+
             String imageId = imageList[i].getName();
             try {
                 FileInputStream stream = new FileInputStream(imageList[i]);

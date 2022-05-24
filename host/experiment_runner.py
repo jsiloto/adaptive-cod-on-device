@@ -20,11 +20,14 @@ if __name__ == "__main__":
 
     for option in all_options:
         model_name, model_class, mode = option
-        model_file = eval_single_model(model_class=model_class, mode=mode, out_dir=args.out_dir)
-        model_name = model_file.split("/")[1]
-        experiment(seconds=args.seconds, model_name=model_name,
+        model_name, model_file, metrics = eval_single_model(model_class=model_class, mode=mode, out_dir=args.out_dir)
+        try:
+            experiment(seconds=args.seconds, model_name=model_name,
                    model_file=model_file, mode=mode,
-                   url="", norepeat=False, out_dir=args.out_dir)
+                   url="", norepeat=False, out_dir=args.out_dir, save=False)
+        except Exception as e:
+            print("Failed experiment: {}".format(model_name))
+            print(e)
 
 
 

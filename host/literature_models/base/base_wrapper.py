@@ -1,6 +1,7 @@
 from typing import List
 from torch import nn
 
+
 class BaseWrapper():
 
     @classmethod
@@ -10,9 +11,11 @@ class BaseWrapper():
     def get_printname(self) -> str:
         raise NotImplementedError()
 
+    def get_reported_results(self, mode) -> (float, float):
+        raise NotImplementedError("Should return (mAP, bandwidth-Bytes)")
+
     def generate_torchscript(self, out_dir) -> str:
         raise NotImplementedError("Should return the output .ptl file when implemented")
 
-    def generate_metrics(self, out_dir) -> str:
-        raise NotImplementedError("Should return the output .csv file when implemented")
-
+    def generate_metrics(self):
+        raise NotImplementedError("Should return a dictionary with metrics data")

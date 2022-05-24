@@ -32,7 +32,7 @@ def measure_power(um25c_device: UM25C, seconds=10):
 
 
 def experiment(seconds: int, model_name: str, model_file: str, mode: float, url: str,
-               norepeat: bool, out_dir: str):
+               out_dir: str, norepeat: bool, save: bool=True):
     # Check if experiment exists
     path = out_dir
     os.makedirs(path, exist_ok=True)
@@ -56,14 +56,16 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     # Load Application
     adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
     adb_device = adb_client.device()
-    adb_device.push(model_file, "/data/user/0/org.recod.acod/files")
+    if len(model_file) > 0:
+        print("Installing model: {}".format(model_file))
+        adb_device.push(model_file, "/data/user/0/org.recod.acod/files")
     apk_manager = ApkManager(adb_device=adb_device, apk_filepath="")
 
     # Connect to bluetooth device
     um25c = UM25C(UM25C_ADDRESS)
 
     # Start experiment loop
-    apk_manager.start(model=model_name, mode=mode, url=url)
+    apk_manager.start(model=model_file.split("/")[1], mode=mode, url=url)
     time.sleep(3)  # Warmup
     print("Experiment Start!")
     apk_manager.clear_logs()
@@ -96,11 +98,14 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
         "num_images": num_images,
         "compute_latency": seconds / num_images}
 
-    with open(experiment_name + ".json", 'w') as f:
-        json.dump(experiment_data, f)
+    if save:
+        with open(experiment_name + ".json", 'w') as f:
+            json.dump(experiment_data, f)
+        plt.clf()
+        plt.plot(t, w)
+        plt.savefig(experiment_name + ".png")
 
-    plt.plot(t, w)
-    plt.savefig(experiment_name + ".png")
+    return experiment_data
 
 
 def get_argparser():
