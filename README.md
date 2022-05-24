@@ -2,19 +2,8 @@
 
 
 ```shell
-docker run --rm -it --gpus all -p 5000:5000 \
- --shm-size=16G -v $PWD:/workspace \
- -w /workspace/server \
- -v /data/dataset/coco2017:/workspace/resource/dataset/coco2017 \
-  --name acod-server acod-server ./setup.sh
-```
-
-```shell
-docker run --rm -it --gpus all \
- --shm-size=16G -v $PWD:/workspace \
- -w /workspace/device \
- -v /data/dataset/coco2017:/workspace/resource/dataset/coco2017 \
-  --name acod-device acod-server /bin/bash
+./docker_build.sh
+./docker_run.sh
 ```
 
 ```shell
@@ -28,4 +17,8 @@ rm  main.1.org.recod.acod.obb
 wget https://github.com/steinwurf/adb-join-wifi/releases/download/1.0.1/adb-join-wifi.apk
 adb install adb-join-wifi.apk
 adb shell am start -n com.steinwurf.adbjoinwifi/.MainActivity -e ssid jsiloto -e password_type WPA -e password senha123
+```
+
+```shell
+docker exec -it juliano.siloto.acod-server jupyter notebook --allow-root -ip 0.0.0.0
 ```

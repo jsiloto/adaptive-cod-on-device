@@ -40,7 +40,6 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
         .format(seconds, model_name, mode, not (not url))
 
     print(experiment_name)
-    print(os.path.exists(experiment_name+".json"))
     if norepeat and os.path.exists(experiment_name+".json"):
         exit(0)
 
@@ -50,14 +49,13 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
 
     os.system('adb root')
     os.system('adb shell setenforce 0')
-
     print("Seting Experiment....")
-
+    time.sleep(3)  # Warmup
     # Load Application
     adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
     adb_device = adb_client.device()
     if len(model_file) > 0:
-        print("Installing model: {}".format(model_file))
+        # print("Installing model: {}".format(model_file))
         adb_device.push(model_file, "/data/user/0/org.recod.acod/files")
     apk_manager = ApkManager(adb_device=adb_device, apk_filepath="")
 
