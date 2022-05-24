@@ -21,6 +21,7 @@ public class Helper {
                 }
                 os.flush();
             }
+            System.out.println(file.getAbsolutePath());
             return file.getAbsolutePath();
         }
     }

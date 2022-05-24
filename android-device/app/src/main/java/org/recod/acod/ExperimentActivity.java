@@ -46,7 +46,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         // Acquire User Interface
         setContentView(R.layout.activity_experiment);
         textConfigs = findViewById(R.id.textConfigs);
-        textConfigs.setText(String.format("model:%s, mode=%f, server=%s",model, mode, url));
+        textConfigs.setText(String.format("model:%s, mode=%s, server=%s",model, mode, url));
 
         // Load Experiment Assets
         try {

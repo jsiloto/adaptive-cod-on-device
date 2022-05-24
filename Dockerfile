@@ -37,6 +37,11 @@ RUN pip install tensorboardX \
     wandb pyyaml webcolors tensorboard matplotlib \
     scipy scikit-learn jupyter torch_tb_profiler
 
+
+RUN apt-get install -y android-tools-adb android-tools-fastboot
+RUN apt-get install -y libbluetooth-dev
+RUN pip install adbutils pybluez
+
 ARG UID
 ARG GID
 ARG USER

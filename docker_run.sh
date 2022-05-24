@@ -3,11 +3,12 @@
 COMMAND="docker run --rm -it \
             --shm-size=32G  \
             -v /work/juliano.siloto/datasets:/work/resource/dataset  \
-            -v $PWD:/work -w /work/server \
+            -v $PWD:/work -w /work \
             -u $(id -u):$(id -g)  \
             --cap-add LINUX_IMMUTABLE \
             --userns=host  \
-            -p 5000:5000 \
+            --net=host \
+            --privileged -v /dev/bus/usb:/dev/bus/usb \
             --name juliano.siloto.acod-server  \
             juliano.siloto/adaptive_cod"
 
@@ -25,4 +26,11 @@ COMMAND="docker run --rm -it \
 #            --name juliano.siloto.acod-server.gpu0 \
 #            juliano.siloto/adaptive_cod ./setup.sh"
 
+adb root
+adb shell setenforce 0
+adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
+adb shell wm size 1200x800
+adb kill-server
+sudo killall -9 bluetoothd
 eval "${COMMAND}"

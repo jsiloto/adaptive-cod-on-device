@@ -11,7 +11,7 @@ class ApkManager():
         self.application_name = "org.recod.acod" #aapt dump badging self.apk | grep package:\ name
 
 
-    def start(self, model="", url="", config=None):
+    def start(self, model="", url="", mode=None):
         self.stop()
         self.adb.shell("pm grant {}/ android.permission.READ_EXTERNAL_STORAGE"
                        .format(self.application_name))
@@ -19,7 +19,7 @@ class ApkManager():
         commandline = "am start -n {}/.ExperimentActivity".format(self.application_name)
         commandline += " --es model \"{}\"".format(model)
         commandline += " --es url \"{}\"".format(url)
-        commandline += " --ef config \"{}\"".format(config)
+        commandline += " --ef mode \"{}\"".format(mode)
         self.adb.shell(commandline)
 
     def stop(self):
