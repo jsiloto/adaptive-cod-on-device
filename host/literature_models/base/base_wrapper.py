@@ -4,8 +4,8 @@ from torch import nn
 class BaseWrapper():
 
     @classmethod
-    def get_config_options(cls) -> List[str]:
-        return cls.get_config_options()
+    def get_mode_options(cls) -> List[str]:
+        return cls.get_mode_options()
 
     def get_printname(self) -> str:
         raise NotImplementedError()

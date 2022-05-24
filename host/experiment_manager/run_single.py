@@ -3,14 +3,15 @@
 import argparse
 import time
 import matplotlib.pyplot as plt
-from apk_manager import ApkManager
-from um25c import UM25C
 import adbutils
 import os
 import re
 import json
 from tqdm import tqdm
 import bluetooth
+
+from experiment_manager.apk_manager import ApkManager
+from experiment_manager.um25c import UM25C
 
 UM25C_ADDRESS = "00:16:A5:00:12:8A"
 
@@ -30,12 +31,13 @@ def measure_power(um25c_device: UM25C, seconds=10):
     return data
 
 
-def experiment(seconds: int, model: str, mode: float, url: str, norepeat: bool):
+def experiment(seconds: int, model_name: str, model_file: str, mode: float, url: str,
+               norepeat: bool, out_dir: str):
     # Check if experiment exists
-    path = './experiment-results'
+    path = out_dir
     os.makedirs(path, exist_ok=True)
-    experiment_name = path + "/" + "{}s_{}_{:03d}_wifi_{}"\
-        .format(seconds, model, int(100 * mode), not (not url))
+    experiment_name = path + "/" + "{}s_{}_{}_wifi_{}"\
+        .format(seconds, model_name, mode, not (not url))
 
     print(experiment_name)
     print(os.path.exists(experiment_name+".json"))
@@ -54,13 +56,14 @@ def experiment(seconds: int, model: str, mode: float, url: str, norepeat: bool):
     # Load Application
     adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
     adb_device = adb_client.device()
+    adb_device.push(model_file, "/data/user/0/org.recod.acod/files")
     apk_manager = ApkManager(adb_device=adb_device, apk_filepath="")
 
     # Connect to bluetooth device
     um25c = UM25C(UM25C_ADDRESS)
 
     # Start experiment loop
-    apk_manager.start(model=model, mode=mode, url=url)
+    apk_manager.start(model=model_name, mode=mode, url=url)
     time.sleep(3)  # Warmup
     print("Experiment Start!")
     apk_manager.clear_logs()
@@ -82,7 +85,7 @@ def experiment(seconds: int, model: str, mode: float, url: str, norepeat: bool):
         joules += w[i + 1] * (t[i + 1] - t[i]).total_seconds()
 
     experiment_data = {
-        "model": model,
+        "model": model_name,
         "mode": mode,
         "seconds": seconds,
         "url": url,

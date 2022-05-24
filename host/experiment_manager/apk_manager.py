@@ -19,7 +19,7 @@ class ApkManager():
         commandline = "am start -n {}/.ExperimentActivity".format(self.application_name)
         commandline += " --es model \"{}\"".format(model)
         commandline += " --es url \"{}\"".format(url)
-        commandline += " --ef mode \"{}\"".format(mode)
+        commandline += " --es mode \"{}\"".format(mode)
         self.adb.shell(commandline)
 
     def stop(self):

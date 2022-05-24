@@ -1,23 +1,19 @@
-import sys, os
-
-from matsubara2022.encoder import MatsubaraEntropicEncoder
-
-sys.path.insert(0, os.path.abspath('..'))
+import os
 import pandas as pd
 import torch
 from ptflops import get_model_complexity_info
-from base_wrapper import BaseWrapper
-
+from literature_models.base.base_wrapper import BaseWrapper
+from literature_models.matsubara2022.encoder import MatsubaraEntropicEncoder
 
 
 class Matsubara2022(BaseWrapper):
 
     @classmethod
-    def get_config_options(cls):
+    def get_mode_options(cls):
         return ["default"]
 
-    def __init__(self, config=None):
-        self.layer = config
+    def __init__(self, mode=None):
+        self.layer = mode
         self.encoder = MatsubaraEntropicEncoder()
 
     def get_printname(self):

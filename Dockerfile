@@ -41,6 +41,8 @@ RUN pip install tensorboardX \
 RUN apt-get install -y android-tools-adb android-tools-fastboot
 RUN apt-get install -y libbluetooth-dev
 RUN pip install adbutils pybluez
+RUN pip install --upgrade numpy
+RUN pip install compressai
 
 ARG UID
 ARG GID

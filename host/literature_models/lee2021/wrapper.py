@@ -1,23 +1,21 @@
-import sys, os
-
-sys.path.insert(0, os.path.abspath('..'))
+import os
 import pandas as pd
 import torch
 from ptflops import get_model_complexity_info
-from base_wrapper import BaseWrapper
-from lee2021.encoder import LeeYoloV5sEncoder
+from literature_models.base.base_wrapper import BaseWrapper
+from literature_models.lee2021.encoder import LeeYoloV5sEncoder
 
 
 class Lee2021(BaseWrapper):
 
     @classmethod
-    def get_config_options(cls):
+    def get_mode_options(cls):
         return ["3", "5", "7", "10"]
 
-    def __init__(self, config=None):
-        if config is None:
-            config = "3"
-        self.layer = config
+    def __init__(self, mode=None):
+        if mode is None:
+            mode = "3"
+        self.layer = mode
         self.encoder = LeeYoloV5sEncoder(num_layers=int(self.layer))
 
     def get_printname(self):

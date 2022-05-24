@@ -2,7 +2,7 @@ import argparse
 import os
 
 from lee2021.wrapper import Lee2021
-from base_wrapper import BaseWrapper
+from host.literature_models.base.base_wrapper import BaseWrapper
 from matsubara2022.wrapper import Matsubara2022
 
 wrapper_dict = {
@@ -21,13 +21,13 @@ def get_argparser():
 def print_available_options():
     print("Model Not Found - Avilable Model Options: [Configs]")
     for k, v in wrapper_dict.items():
-        print("{}: {}".format(k, v.get_config_options()))
+        print("{}: {}".format(k, v.get_mode_options()))
 
 
 def eval_single_model(model, config):
     model_class = wrapper_dict[model]
     wrapper: BaseWrapper = model_class(config=config)
-    out_dir = "./output"
+    out_dir = "output"
     os.makedirs(out_dir, exist_ok=True)
     out_file = wrapper.generate_torchscript(out_dir)
     if not os.path.exists(out_file):
@@ -39,7 +39,7 @@ def eval_single_model(model, config):
 
 def eval_all_models(args):
     for k, v in wrapper_dict.items():
-        for config in v.get_config_options():
+        for config in v.get_mode_options():
             eval_single_model(k, config)
 
 
