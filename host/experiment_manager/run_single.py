@@ -65,7 +65,9 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     um25c = UM25C(UM25C_ADDRESS)
 
     # Start experiment loop
-    apk_manager.start(model=model_file.split("/")[1], mode=mode, url=url)
+    if "/" in model_file:
+        model_file = model_file.split("/")[1]
+    apk_manager.start(model=model_file, mode=mode, url=url)
     time.sleep(3)  # Warmup
     print("Experiment Start!")
     apk_manager.clear_logs()
