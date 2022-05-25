@@ -34,7 +34,7 @@ if __name__ == "__main__":
         random.shuffle(all_options)
 
     if args.clean:
-        shutil.rmtree(args.out_dir)
+        shutil.rmtree(args.out_dir, ignore_errors=True)
 
     for idx, option in enumerate(all_options):
         print()

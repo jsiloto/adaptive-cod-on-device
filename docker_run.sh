@@ -10,7 +10,7 @@ COMMAND="docker run --rm -it \
             --net=host \
             --privileged -v /dev/bus/usb:/dev/bus/usb \
             --name juliano.siloto.acod-server  \
-            juliano.siloto/adaptive_cod"
+            juliano.siloto/adaptive_cod_on_device"
 
 #
 #COMMAND="docker run --gpus device=0 --rm -it \

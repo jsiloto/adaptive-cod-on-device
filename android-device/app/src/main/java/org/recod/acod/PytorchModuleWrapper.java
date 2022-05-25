@@ -2,6 +2,7 @@ package org.recod.acod;
 
 import android.graphics.Bitmap;
 import android.os.SystemClock;
+import android.util.Log;
 
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
@@ -12,7 +13,7 @@ import org.pytorch.torchvision.TensorImageUtils;
 public class PytorchModuleWrapper {
     Module mModule;
     boolean dummy = false;
-    String mode = "1.0f";
+    int mode = 1;
 
     public PytorchModuleWrapper(String modulePath) {
         mModule = LiteModuleLoader.load(modulePath);
@@ -50,15 +51,24 @@ public class PytorchModuleWrapper {
         return qx;
     }
 
-    public void setMode(String mode) {
+    public void setMode(int mode) {
         if (!dummy) {
             this.mode = mode;
+            IValue input = IValue.from(mode);
+            Log.d("MyTAG", input.toString());
+            mModule.runMethod("set_mode", input);
+//            mModule.runMethod("test");
+
+
+//            mModule.runMethod("set_mode", input);
             try {
                 //            mModule.runMethod("set_config", IValue.from(width), IValue.from(width), IValue.from((int)(4*width)));
 //                mModule.runMethod("set_width", IValue.from(0.25));
 //                int i = 1 + (int) ((width - 0.25) * 12);
 //                i = 1 +(int)((mode-0.25)*4);
-                mModule.runMethod("set_mode", IValue.from(mode));
+//                IValue input = IValue.from((long)(mode));
+//                Log.d("MyTAG", input.toString());
+                mModule.runMethod("set_mode", input);
             } catch (Exception e) {
             }
         }

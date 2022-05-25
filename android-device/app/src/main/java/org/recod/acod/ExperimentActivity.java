@@ -33,7 +33,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         String url = "";
         String model = "";
         String modelPath =  "";
-        String mode = "1.0f";
+        int mode = 1;
         boolean useDummyModel = false;
         boolean useDummyWifi = false;
 
@@ -42,8 +42,9 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         if (extras != null) {
             url = extras.getString("url", url);
             model = extras.getString("model", model);
-            mode = extras.getString("mode", mode);
+            mode = extras.getInt("mode", mode);
         }
+//        model = "ours_size_14.ptl";
         useDummyModel = model.isEmpty() || model.equals("dummy");
         useDummyWifi = url.isEmpty();
 
