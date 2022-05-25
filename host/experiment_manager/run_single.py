@@ -55,8 +55,8 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
     adb_device = adb_client.device()
     if len(model_file) > 0:
-        # print("Installing model: {}".format(model_file))
-        adb_device.push(model_file, "/data/user/0/org.recod.acod/files")
+        print("Installing model: {}".format(model_file))
+        adb_device.push(model_file, "/data/user/0/org.recod.acod/files/")
     apk_manager = ApkManager(adb_device=adb_device, apk_filepath="")
 
     # Connect to bluetooth device
@@ -65,9 +65,14 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     # Start experiment loop
     if "/" in model_file:
         model_file = model_file.split("/")[1]
-    apk_manager.start(model=model_file, mode=mode, url=url)
-    time.sleep(3)  # Warmup
-    print("Experiment Start!")
+
+    pid = ""
+    while len(pid) <= 0:
+        apk_manager.start(model=model_file, mode=mode, url=url)
+        time.sleep(3)  # Warmup
+        pid = apk_manager.get_pid()
+
+    print("Experiment Start! PID:{}".format(pid))
     apk_manager.clear_logs()
     data = measure_power(um25c_device=um25c, seconds=seconds)
     apk_manager.stop()

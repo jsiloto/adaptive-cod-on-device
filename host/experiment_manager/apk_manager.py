@@ -22,6 +22,10 @@ class ApkManager():
         commandline += " --es mode \"{}\"".format(mode)
         self.adb.shell(commandline)
 
+    def get_pid(self):
+        pid = self.adb.shell("pidof {}".format(self.application_name))
+        return pid
+
     def stop(self):
         self.adb.shell("am force-stop {}".format(self.application_name))
 

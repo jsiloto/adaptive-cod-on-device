@@ -6,9 +6,9 @@ from literature_models.lee2021.wrapper import Lee2021
 from literature_models.matsubara2022.wrapper import Matsubara2022
 
 wrapper_dict = {
-    "dummy": Dummy,
+    # "dummy": Dummy,
     "lee2021": Lee2021,
-    "matsubara2022": Matsubara2022,
+    # "matsubara2022": Matsubara2022,
 }
 
 def get_all_options():

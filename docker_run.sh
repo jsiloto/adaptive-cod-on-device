@@ -27,9 +27,9 @@ COMMAND="docker run --rm -it \
 
 adb root
 adb shell setenforce 0
-adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
-adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
-adb shell wm size 1200x800
+adb shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
+adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
+adb shell wm size 900x1600
 adb kill-server
 sudo killall -9 bluetoothd
 eval "${COMMAND}"
