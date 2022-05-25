@@ -25,8 +25,7 @@ public class PytorchModuleWrapper {
         }
     }
 
-
-    public QuantizedTensor run(Bitmap bitmap, String imageId) {
+    public Tensor run(Bitmap bitmap){
         Tensor outputTensor = null;
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
                 bitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);
@@ -38,6 +37,12 @@ public class PytorchModuleWrapper {
             IValue outputTuple = mModule.forward(IValue.from(inputTensor));
             outputTensor = outputTuple.toTensor();
         }
+        return outputTensor;
+    }
+
+
+    public QuantizedTensor runQuantized(Bitmap bitmap, String imageId) {
+        Tensor outputTensor = run(bitmap);
         QuantizedTensor qx = new QuantizedTensor(outputTensor, 8, imageId);
         qx.originalWidth = bitmap.getWidth();
         qx.originalHeight = bitmap.getHeight();
