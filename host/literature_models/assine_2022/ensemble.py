@@ -19,7 +19,7 @@ class Ensemble(nn.Module):
 
     @torch.jit.export
     def set_mode(self, mode: int):
-        self.size = mode % 10
+        self.size = int(mode / 10)
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):

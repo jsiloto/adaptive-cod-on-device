@@ -54,20 +54,9 @@ public class PytorchModuleWrapper {
     public void setMode(int mode) {
         if (!dummy) {
             this.mode = mode;
-            IValue input = IValue.from(mode);
-            Log.d("MyTAG", input.toString());
-            mModule.runMethod("set_mode", input);
-//            mModule.runMethod("test");
-
-
-//            mModule.runMethod("set_mode", input);
             try {
-                //            mModule.runMethod("set_config", IValue.from(width), IValue.from(width), IValue.from((int)(4*width)));
-//                mModule.runMethod("set_width", IValue.from(0.25));
-//                int i = 1 + (int) ((width - 0.25) * 12);
-//                i = 1 +(int)((mode-0.25)*4);
-//                IValue input = IValue.from((long)(mode));
-//                Log.d("MyTAG", input.toString());
+                IValue input = IValue.from(mode);
+                Log.d("MyTAG", Integer.toString(mode));
                 mModule.runMethod("set_mode", input);
             } catch (Exception e) {
             }

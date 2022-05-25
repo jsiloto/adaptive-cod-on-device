@@ -17,7 +17,7 @@ def get_argparser():
     argparser.add_argument('-clean', action='store_true', help='Remove all previous experiments')
     argparser.add_argument('--repeats', type=int, default=0, help='Repeat N times all experiments')
     argparser.add_argument('--model', help='(Optional) Run specific model')
-    argparser.add_argument('--mode', help='(Optional) Run specific mode')
+    argparser.add_argument('--mode', type=int, help='(Optional) Run specific mode')
     argparser.add_argument('--seconds', type=int, default=60)
     return argparser
 
@@ -36,10 +36,15 @@ if __name__ == "__main__":
     if args.clean:
         shutil.rmtree(args.out_dir, ignore_errors=True)
 
+    if args.model and args.mode:
+        all_options = [option for option in all_options
+                       if option[0] == args.model and option[2] == args.mode]
+
+
     for idx, option in enumerate(all_options):
         print()
         print("############################################################")
-        print("Running Experiment {}/{}".format(idx+1, len(all_options)))
+        print("Running Experiment {}/{}".format(idx + 1, len(all_options)))
         model_name, model_class, mode = option
         model_name, model_file, metrics = eval_single_model(model_class=model_class, mode=mode, out_dir=args.out_dir)
         try:
@@ -57,4 +62,3 @@ if __name__ == "__main__":
             print("Failed experiment: {}".format(model_name))
             print(e)
             print(traceback.format_exc())
-

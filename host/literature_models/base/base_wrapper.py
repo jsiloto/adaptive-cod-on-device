@@ -5,7 +5,7 @@ from torch import nn
 class BaseWrapper():
 
     @classmethod
-    def get_mode_options(cls) -> List[str]:
+    def get_mode_options(cls) -> List[int]:
         return cls.get_mode_options()
 
     def get_printname(self) -> str:

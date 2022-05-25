@@ -21,6 +21,10 @@ class MatsubaraEntropicEncoder(nn.Module):
         x = self.encoder(x)
         return x
 
+    @torch.jit.export
+    def set_mode(self, mode: int):
+        pass
+
 # if __name__ == '__main__':
 #     encoder = MatsubaraEntropicEncoder()
 #     scripted = torch.jit.script(encoder)

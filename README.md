@@ -28,6 +28,8 @@ rm main.1.org.recod.acod.obb
 
 
 ```shell
+python3 run_experiments.py --seconds 20 -clean -random --repeats 3
+
 docker exec -it juliano.siloto.acod-server jupyter notebook --allow-root -ip 0.0.0.0
 ```
 

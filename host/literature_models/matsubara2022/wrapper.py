@@ -10,7 +10,7 @@ class Matsubara2022(BaseWrapper):
 
     @classmethod
     def get_mode_options(cls):
-        return ["1", "2", "3", "4", "5"]
+        return [1, 2, 3, 4, 5]
 
     def __init__(self, mode=None):
         self.mode = mode
@@ -46,10 +46,10 @@ class Matsubara2022(BaseWrapper):
     def get_reported_results(self, mode) -> (float, float):
         assert mode in self.get_mode_options()
         results = {
-            "1": (36.1, 180e3),
-            "2": (35.9, 90e3),
-            "3": (34.0, 23e3),
-            "4": (29.5, 15e3),
-            "5": (26.0, 8e3),
+            1: (36.1, 180e3),
+            2: (35.9, 90e3),
+            3: (34.0, 23e3),
+            4: (29.5, 15e3),
+            5: (26.0, 8e3),
         }
         return results[mode]

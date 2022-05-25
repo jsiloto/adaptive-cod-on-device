@@ -10,7 +10,7 @@ class Dummy(BaseWrapper):
 
     @classmethod
     def get_mode_options(cls):
-        return ["1"]
+        return [1]
 
     def __init__(self, mode=None):
         self.encoder = None

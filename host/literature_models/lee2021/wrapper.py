@@ -1,4 +1,6 @@
 import os
+from typing import List
+
 import pandas as pd
 import torch
 from ptflops import get_model_complexity_info
@@ -9,14 +11,12 @@ from literature_models.lee2021.encoder import LeeYoloV5sEncoder
 class Lee2021(BaseWrapper):
 
     @classmethod
-    def get_mode_options(cls):
-        return ["3", "5", "7", "10"]
+    def get_mode_options(cls) -> List[int]:
+        return [3, 5, 7, 10]
 
-    def __init__(self, mode=None):
-        if mode is None:
-            mode = "3"
-        self.mode = mode
-        self.encoder = LeeYoloV5sEncoder(num_layers=int(self.mode))
+    def __init__(self, mode: int = 3):
+        self.mode: int = mode
+        self.encoder = LeeYoloV5sEncoder(num_layers=self.mode)
 
     def get_printname(self):
         return "lee2021_layer_{}".format(self.mode)
@@ -48,9 +48,9 @@ class Lee2021(BaseWrapper):
     def get_reported_results(self, mode) -> (float, int):
         assert mode in self.get_mode_options()
         results = {
-            "3": (36.8, 30.5e3),
-            "5": (36.7, 16.2e3),
-            "7": (36.5, 8.8e3),
-            "10": (36.4, 4.7e3),
+            3: (36.8, 30.5e3),
+            5: (36.7, 16.2e3),
+            7: (36.5, 8.8e3),
+            10: (36.4, 4.7e3),
         }
         return results[mode]
