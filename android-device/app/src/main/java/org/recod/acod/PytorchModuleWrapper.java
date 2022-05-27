@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.util.Log;
 
+import org.pytorch.Device;
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
@@ -16,7 +17,7 @@ public class PytorchModuleWrapper {
     int mode = 1;
 
     public PytorchModuleWrapper(String modulePath) {
-        mModule = LiteModuleLoader.load(modulePath);
+        mModule = LiteModuleLoader.load(modulePath, null, Device.VULKAN);
     }
 
     public PytorchModuleWrapper(String modulePath, boolean dummy) {

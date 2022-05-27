@@ -44,7 +44,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
             model = extras.getString("model", model);
             mode = extras.getInt("mode", mode);
         }
-//        model = "ours_size_14.ptl";
+        model = "effd2_encoder.ptl";
         useDummyModel = model.isEmpty() || model.equals("dummy");
         useDummyWifi = url.isEmpty();
 

@@ -31,5 +31,5 @@ adb shell content insert --uri content://settings/system --bind name:s:accelerom
 adb shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:1
 adb shell wm size 800x1200
 adb kill-server
-sudo killall -9 bluetoothd
+#sudo killall -9 bluetoothd
 eval "${COMMAND}"

@@ -14,7 +14,7 @@ https://flash.android.com/devices
 - Download the [Aplication APK]()
 
 ```shell
-adb push main.1.org.recod.acod.obb /storage/emulated/0/Android/obb/org.recod.acod/main.1.org.recod.acod.obb
+adb push main.1.org.recod.acod.obb /storage/emulated/0/Android/obb/org.recod.acod.debug/main.1.org.recod.acod.obb
 rm main.1.org.recod.acod.obb
 ```
 

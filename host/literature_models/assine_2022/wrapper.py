@@ -18,7 +18,7 @@ class Assine2022(BaseWrapper):
 
     def __init__(self, mode=None):
         if mode is None:
-            mode = 14
+            mode = 44
         self.mode = mode
         encoder_builder = Assine2022Encoder
         self.encoder = Ensemble(encoder_builder)
@@ -35,9 +35,11 @@ class Assine2022(BaseWrapper):
         return out_file
 
     def generate_metrics(self):
+        self.encoder.set_mode(mode=self.mode)
         result = get_model_complexity_info(self.encoder, (3, 640, 640),
                                            print_per_layer_stat=False,
                                            as_strings=False)
+        print(result)
         dict = {'model': self.get_printname(),
                 'macs': result[0],
                 'params': result[1]}

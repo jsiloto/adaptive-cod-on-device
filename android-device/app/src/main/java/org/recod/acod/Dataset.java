@@ -1,7 +1,6 @@
 package org.recod.acod;
 
 import android.content.Context;
-import android.os.Environment;
 import android.os.storage.OnObbStateChangeListener;
 import android.os.storage.StorageManager;
 import android.util.Log;
@@ -17,8 +16,12 @@ public class Dataset {
     private StorageManager storageManager;
 
     protected Dataset(Context context){
-        obbPath = Environment.getExternalStorageDirectory() +
-                "/Android/obb/org.recod.acod/main.1.org.recod.acod.obb";
+        obbPath = context.getObbDir() +
+                "/main.1.org.recod.acod.obb";
+
+//        File[] a = context.getObbDirs();
+
+        System.out.println(obbPath);
         storageManager = (StorageManager) context.getSystemService(context.STORAGE_SERVICE);
         storageManager.mountObb(obbPath, null, mEventListener);
     }
