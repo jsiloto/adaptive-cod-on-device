@@ -2,6 +2,8 @@ import torch
 from torch import nn
 from typing import List, Tuple
 
+from literature_models.common.efficientdet.preprocess import preprocess_for_torchscript
+
 
 class Ensemble(nn.Module):
     def __init__(self, encoder_builder):
@@ -23,6 +25,7 @@ class Ensemble(nn.Module):
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):
+        x = preprocess_for_torchscript(x, max_size=640)
         output_list = []
         x_ = torch.nn.functional.interpolate(
             x, scale_factor=[self.scale_factor, self.scale_factor], mode='nearest')
