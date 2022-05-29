@@ -1,7 +1,7 @@
 import os
 
 
-from literature_models.assine_2022a.wrapper import Assine2022A
+from literature_models.assine_2022b.wrapper import Assine2022B
 from literature_models.base.base_wrapper import BaseWrapper
 from literature_models.base.dummy_wrapper import Dummy
 from literature_models.lee2021.wrapper import Lee2021
@@ -11,7 +11,7 @@ wrapper_dict = {
     "dummy": Dummy,
     "lee2021": Lee2021,
     "matsubara2022": Matsubara2022,
-    "assine2022a": Assine2022A,
+    "assine2022b": Assine2022B,
 }
 
 def get_all_options():
