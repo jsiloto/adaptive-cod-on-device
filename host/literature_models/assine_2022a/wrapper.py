@@ -1,12 +1,10 @@
 import os
-import pandas as pd
 import torch
 from ptflops import get_model_complexity_info
 
 from literature_models.assine_2022a.encoder import Assine2022AEncoder
 from literature_models.assine_2022a.ensemble import Ensemble
 from literature_models.base.base_wrapper import BaseWrapper
-from literature_models.lee2021.encoder import LeeYoloV5sEncoder
 
 
 class Assine2022A(BaseWrapper):
