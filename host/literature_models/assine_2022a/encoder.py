@@ -3,7 +3,7 @@ from literature_models.common.efficientdet.blocks import MBConvBlockV2
 from literature_models.common.efficientdet.utils import get_model_params, BlockArgs
 
 
-class Assine2022Encoder(nn.Module):
+class Assine2022AEncoder(nn.Module):
     def __init__(self):
         super().__init__()
         last_block_output = 24
