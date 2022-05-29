@@ -25,7 +25,7 @@ class Ensemble(nn.Module):
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):
-        x = preprocess_for_torchscript(x, max_size=640)
+        x = preprocess_for_torchscript(x, max_size=768)
         output_list = []
         x_ = torch.nn.functional.interpolate(
             x, scale_factor=[self.scale_factor, self.scale_factor], mode='nearest')
