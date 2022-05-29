@@ -2,8 +2,8 @@ import os
 import torch
 from ptflops import get_model_complexity_info
 
-from literature_models.assine_2022a.encoder import Assine2022AEncoder
-
+from literature_models.assine_2022b.encoder import Assine2022BEncoder
+from literature_models.assine_2022b.ensemble import Ensemble
 from literature_models.base.base_wrapper import BaseWrapper
 
 
@@ -12,28 +12,29 @@ class Assine2022B(BaseWrapper):
     @classmethod
     def get_mode_options(cls):
         # Ensemblesize/numbits
-        return [25, 50, 75, 100]
+        return [14, 24, 34, 44, 11, 22, 33]
 
     def __init__(self, mode=None):
         if mode is None:
             mode = 44
         self.mode = mode
-        self.encoder = Assine2022AEncoder
+        encoder_builder = Assine2022BEncoder
+        self.encoder = Ensemble(encoder_builder)
 
     def get_printname(self):
-        return "assine2022a_{}".format(self.mode)
+        return "assine2022B_{}".format(self.mode)
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
         scripted.eval()
-        output_name = "assine2022a_{}.ptl".format(self.mode)
+        output_name = "assine2022B_{}.ptl".format(self.mode)
         out_file = os.path.join(out_dir, output_name)
         scripted._save_for_lite_interpreter(out_file)
         return out_file
 
     def generate_metrics(self):
         self.encoder.set_mode(mode=self.mode)
-        result = get_model_complexity_info(self.encoder, (3, 768, 768),
+        result = get_model_complexity_info(self.encoder, (3, 640, 640),
                                            print_per_layer_stat=False,
                                            as_strings=False)
         print(result)
