@@ -9,10 +9,10 @@ from literature_models.lee2021.wrapper import Lee2021
 from literature_models.matsubara2022.wrapper import Matsubara2022
 
 wrapper_dict = {
-    # "dummy": Dummy,
-    # "lee2021": Lee2021,
-    # "matsubara2022": Matsubara2022,
-    # "assine2022b": Assine2022B,
+    "dummy": Dummy,
+    "lee2021": Lee2021,
+    "matsubara2022": Matsubara2022,
+    "assine2022b": Assine2022B,
     "assine2022a": Assine2022A,
 }
 
