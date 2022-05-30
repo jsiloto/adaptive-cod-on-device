@@ -32,7 +32,7 @@ class Assine2022A(BaseWrapper):
     def generate_metrics(self):
         self.encoder.set_mode(mode=self.mode)
         result = get_model_complexity_info(self.encoder, (3, 768, 768),
-                                           print_per_layer_stat=True,
+                                           print_per_layer_stat=False,
                                            as_strings=False,
                                            custom_modules_hooks=custom_module_mapping)
         print(result)
