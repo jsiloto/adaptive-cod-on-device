@@ -44,7 +44,8 @@ if __name__ == "__main__":
     for idx, option in enumerate(all_options):
         print()
         print("############################################################")
-        print("Running Experiment {}/{}".format(idx + 1, len(all_options)))
+        print("Running Experiment {}/{} - ETA:{}s"
+              .format(idx + 1, len(all_options),  (len(all_options)-idx)*(args.seconds+5)))
         model_name, model_class, mode = option
         model_name, model_file, metrics = eval_single_model(model_class=model_class, mode=mode, out_dir=args.out_dir)
         try:

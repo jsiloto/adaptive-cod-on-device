@@ -1,11 +1,9 @@
 import os
 import torch
 from ptflops import get_model_complexity_info
-
 from literature_models.assine_2022a.encoder import Assine2022AEncoder
-
 from literature_models.base.base_wrapper import BaseWrapper
-
+from literature_models.common.analyzer.hooks import custom_module_mapping
 
 class Assine2022A(BaseWrapper):
 
@@ -34,8 +32,9 @@ class Assine2022A(BaseWrapper):
     def generate_metrics(self):
         self.encoder.set_mode(mode=self.mode)
         result = get_model_complexity_info(self.encoder, (3, 768, 768),
-                                           print_per_layer_stat=False,
-                                           as_strings=False)
+                                           print_per_layer_stat=True,
+                                           as_strings=False,
+                                           custom_modules_hooks=custom_module_mapping)
         print(result)
         dict = {'model': self.get_printname(),
                 'macs': result[0],
@@ -51,7 +50,7 @@ class Assine2022A(BaseWrapper):
             25: (31.65, 110e3),
             50: (37.84, 220e3),
             75: (39.88, 330e3),
-            100: (39.55, 330e3),
+            100: (39.55, 440e3),
         }
 
         return results[mode]

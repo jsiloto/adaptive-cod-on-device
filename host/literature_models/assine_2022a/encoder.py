@@ -60,7 +60,7 @@ class Assine2022AEncoder(nn.Module):
             self.blocks.append(trans_block)
 
 
-        for bargs in args_list[3:-2]:
+        for bargs in args_list[3:-1]:
             new_block = USMBConvBlock(bargs, global_params)
             self.blocks.append(new_block)
 
