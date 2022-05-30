@@ -22,12 +22,12 @@ class Assine2022B(BaseWrapper):
         self.encoder = Ensemble(encoder_builder)
 
     def get_printname(self):
-        return "assine2022B_{}".format(self.mode)
+        return "assine2022b_{}".format(self.mode)
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
         scripted.eval()
-        output_name = "assine2022B_{}.ptl".format(self.mode)
+        output_name = "assine2022b_{}.ptl".format(self.mode)
         out_file = os.path.join(out_dir, output_name)
         scripted._save_for_lite_interpreter(out_file)
         return out_file

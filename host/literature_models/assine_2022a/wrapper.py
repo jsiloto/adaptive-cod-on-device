@@ -7,7 +7,7 @@ from literature_models.assine_2022a.encoder import Assine2022AEncoder
 from literature_models.base.base_wrapper import BaseWrapper
 
 
-class Assine2022B(BaseWrapper):
+class Assine2022A(BaseWrapper):
 
     @classmethod
     def get_mode_options(cls):
@@ -18,7 +18,7 @@ class Assine2022B(BaseWrapper):
         if mode is None:
             mode = 44
         self.mode = mode
-        self.encoder = Assine2022AEncoder
+        self.encoder = Assine2022AEncoder()
 
     def get_printname(self):
         return "assine2022a_{}".format(self.mode)
@@ -48,15 +48,11 @@ class Assine2022B(BaseWrapper):
     def get_reported_results(self, mode: int) -> (float, float):
         assert mode in self.get_mode_options()
         results = {
-            14: (34.3, 27648.0),
-            24: (36.1, 27648.0),
-            34: (36.4, 27648.0),
-            44: (36.8, 27648.0),
-
-            11: (14.5, 6912.0),
-            22: (29.4, 13824.0),
-            33: (34.2, 20736.0),
-
+            25: (31.65, 110e3),
+            50: (37.84, 220e3),
+            75: (39.88, 330e3),
+            100: (39.55, 330e3),
         }
+
         return results[mode]
 
