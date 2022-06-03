@@ -15,7 +15,7 @@ def get_argparser():
     argparser.add_argument('--out_dir', type=str, default='out', help='Output Directory')
     argparser.add_argument('-random', action='store_true', help='Run Experiments in a random order')
     argparser.add_argument('-clean', action='store_true', help='Remove all previous experiments')
-    argparser.add_argument('--repeats', type=int, default=0, help='Repeat N times all experiments')
+    argparser.add_argument('--repeats', type=int, default=1, help='Repeat N times all experiments')
     argparser.add_argument('--model', help='(Optional) Run specific model')
     argparser.add_argument('--mode', type=int, help='(Optional) Run specific mode')
     argparser.add_argument('--seconds', type=int, default=60)
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     all_options = get_all_options()
 
     option_copy = copy(all_options)
-    for i in range(args.repeats):
+    for i in range(args.repeats -1 ):
         all_options += option_copy
 
     if args.random:
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         try:
             experiment_data = experiment(seconds=args.seconds, model_name=model_name,
                                          model_file=model_file, mode=mode,
-                                         url="", norepeat=False, out_dir=args.out_dir, save=False)
+                                         url="", norepeat=False, out_dir=args.out_dir, save=True)
 
             experiment_data.update(metrics)
             timestr = time.strftime("%Y%m%d-%H%M%S")

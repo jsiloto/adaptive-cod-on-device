@@ -47,10 +47,9 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     ############### START ##################################
 
 
-    os.system('adb root')
-    os.system('adb shell setenforce 0')
+    # os.system('adb root')
+    # os.system('adb shell setenforce 0')
     print("Seting Experiment....")
-    time.sleep(3)  # Warmup
     # Load Application
     adb_client = adbutils.AdbClient(host="127.0.0.1", port=5037)
     adb_device = adb_client.device()
@@ -69,9 +68,11 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     pid = ""
     while len(pid) <= 0:
         apk_manager.start(model=model_file, mode=mode, url=url)
+        print("Warm Up...")
         time.sleep(3)  # Warmup
         pid = apk_manager.get_pid()
 
+    time.sleep(10)  # Warmup
     print("Experiment Start! PID:{}".format(pid))
     apk_manager.clear_logs()
     data = measure_power(um25c_device=um25c, seconds=seconds)
@@ -91,6 +92,8 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
     for i in range(len(t) - 1):
         joules += w[i + 1] * (t[i + 1] - t[i]).total_seconds()
 
+    seconds = (t[-1] - t[0]).total_seconds()
+
     experiment_data = {
         "model": model_name,
         "mode": mode,
@@ -104,8 +107,8 @@ def experiment(seconds: int, model_name: str, model_file: str, mode: float, url:
         "compute_latency": seconds / num_images}
 
     if save:
-        with open(experiment_name + ".json", 'w') as f:
-            json.dump(experiment_data, f)
+        # with open(experiment_name + ".json", 'w') as f:
+        #     json.dump(experiment_data, f)
         plt.clf()
         plt.plot(t, w)
         plt.savefig(experiment_name + ".png")

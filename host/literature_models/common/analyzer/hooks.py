@@ -2,9 +2,6 @@ import numpy as np
 from literature_models.common.efficientdet.slimmable_ops import USBatchNorm2d, USConv2dStaticSamePadding
 
 def bn_flops_counter_hook(module, input, output):
-    print(type(module))
-    print(module)
-
     input = input[0]
 
     batch_flops = np.prod(input.shape)

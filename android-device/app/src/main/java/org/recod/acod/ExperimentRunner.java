@@ -2,6 +2,7 @@ package org.recod.acod;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import org.pytorch.Tensor;
 
@@ -9,9 +10,10 @@ import java.io.File;
 
 
 public class ExperimentRunner {
-    private int max_images = 500;
+    private int max_images = 100;
     private PytorchModuleWrapper moduleWrapper;
     private ApiHandler apiHandler;
+    private File[] imageList = Dataset.getInstance().getFileList();
 
     ExperimentRunner(PytorchModuleWrapper moduleWrapper, ApiHandler apiHandler, Dataset dataset){
         this.moduleWrapper = moduleWrapper;
@@ -19,13 +21,13 @@ public class ExperimentRunner {
     }
 
     public void run() {
-        File[] imageList = Dataset.getInstance().getFileList();
-        int max_images = 500;
-        
-        for (int i = 0; i < max_images; i++) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imageList[i].getAbsolutePath());
+        int i = 0;
+        while(true){
+            i++;
+            Bitmap bitmap = BitmapFactory.decodeFile(imageList[i%max_images].getAbsolutePath());
             Tensor qx = moduleWrapper.run(bitmap);
-            System.out.println(String.format("ExperimentOutput: %d images", i+1));
+            Log.d("MyTAG", String.format("ExperimentOutput: %d images", i+1));
+//            System.out.println(String.format("ExperimentOutput: %d images", i+1));
         }
     }
 }
