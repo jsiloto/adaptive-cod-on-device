@@ -38,7 +38,7 @@ public class PostTensor {
                 .add("ct", Integer.toString(qx.c))
                 .add("ht", Integer.toString(qx.h))
                 .add("wt", Integer.toString(qx.w))
-                .add("width", Float.toString(qx.alpha))
+                .add("mode", Integer.toString(qx.mode))
                 .add("image_id", qx.imageId)
                 .add("zero_point", Integer.toString(qx.zero_point))
                 .add("scale", Float.toString(qx.scale))

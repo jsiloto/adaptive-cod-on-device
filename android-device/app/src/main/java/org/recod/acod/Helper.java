@@ -23,6 +23,15 @@ public class Helper {
             }
             return file.getAbsolutePath();
         }
+        catch (Exception e){
+            System.out.println(e);
+            if (file.exists() && file.length() > 0) {
+                return file.getAbsolutePath();
+            }
+            else{
+                throw e;
+            }
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package org.recod.acod;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,7 +16,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
     private PytorchModuleWrapper moduleWrapper;
     private Dataset dataset;
     private ExperimentRunner experimentRunner;
-
+    private PowerManager.WakeLock wakeLock;
 
 
     @Override
@@ -24,12 +25,15 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 //            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 //        }
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakelockTag");
+
         // Get Experiment Config from Extras
         // Extras should be passed via adb shell am start [intent] -e [extra]
         String url = "";
         String model = "";
         String modelPath =  "";
-        float alpha = 1.0f;
+        int mode = 1;
         boolean useDummyModel = false;
         boolean useDummyWifi = false;
 
@@ -38,15 +42,16 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
         if (extras != null) {
             url = extras.getString("url", url);
             model = extras.getString("model", model);
-            alpha = extras.getFloat("alpha", alpha);
+            mode = extras.getInt("mode", mode);
         }
-        useDummyModel = model.isEmpty();
+//        model = "ours_size_44.ptl";
+        useDummyModel = model.isEmpty() || model.equals("dummy");
         useDummyWifi = url.isEmpty();
 
         // Acquire User Interface
         setContentView(R.layout.activity_experiment);
         textConfigs = findViewById(R.id.textConfigs);
-        textConfigs.setText(String.format("model:%s, alpha=%f, server=%s",model, alpha, url));
+        textConfigs.setText(String.format("model:%s, mode=%s, server=%s",model, mode, url));
 
         // Load Experiment Assets
         try {
@@ -54,7 +59,7 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
                 modelPath = Helper.assetFilePath(this.getApplicationContext(), model);
             }
             moduleWrapper = new PytorchModuleWrapper(modelPath, useDummyModel);
-            moduleWrapper.setWidth(alpha);
+            moduleWrapper.setMode(mode);
             apiHandler = new ApiHandler(url, useDummyWifi);
             Dataset.LoadFromDisk(this.getApplicationContext());
             dataset = Dataset.getInstance();
@@ -80,7 +85,9 @@ public class ExperimentActivity extends AppCompatActivity implements Runnable {
 
     @Override
     public void run() {
+        wakeLock.acquire();
         experimentRunner.run();
+        wakeLock.release();
     }
 
 }

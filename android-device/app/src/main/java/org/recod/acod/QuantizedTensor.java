@@ -11,7 +11,7 @@ public class QuantizedTensor {
     public int originalWidth = 0;
     public int originalHeight = 0;
     public int c, w, h;
-    public float alpha = 1.0f;
+    public int mode = 1;
     public String imageId = "";
 
 
