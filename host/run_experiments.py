@@ -45,7 +45,7 @@ if __name__ == "__main__":
         print()
         print("############################################################")
         print("Running Experiment {}/{} - ETA:{}s"
-              .format(idx + 1, len(all_options),  (len(all_options)-idx)*(args.seconds+5)))
+              .format(idx + 1, len(all_options),  (len(all_options)-idx)*(args.seconds+10)))
         model_name, model_class, mode = option
         model_name, model_file, metrics = eval_single_model(model_class=model_class, mode=mode, out_dir=args.out_dir)
         try:
