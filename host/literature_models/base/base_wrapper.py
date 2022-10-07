@@ -8,6 +8,10 @@ class BaseWrapper():
     def get_mode_options(cls) -> List[int]:
         return cls.get_mode_options()
 
+    def get_input_shape(self) -> (int, int, int):
+        raise NotImplementedError()
+
+
     def get_printname(self) -> str:
         raise NotImplementedError()
 
