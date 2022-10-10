@@ -16,11 +16,15 @@ wrapper_dict = {
     "assine2022a": Assine2022A,
 }
 
-def get_all_options():
+def get_all_options(dummy=True):
     all_options = []
     for k, v in wrapper_dict.items():
         for mode in v.get_mode_options():
             all_options.append((k, v, mode))
+
+    if not dummy:
+        all_options = [option for option in all_options if option[0]!="dummy"]
+
     return all_options
 
 

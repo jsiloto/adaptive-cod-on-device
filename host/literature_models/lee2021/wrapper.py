@@ -21,6 +21,9 @@ class Lee2021(BaseWrapper):
     def get_printname(self):
         return "lee2021_layer_{}".format(self.mode)
 
+    def get_input_shape(self):
+        return 3, 640, 640
+
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
         output_name = "lee2021_layer_{}.ptl".format(self.mode)

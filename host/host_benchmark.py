@@ -13,15 +13,15 @@ from literature_models.model_wrapper import get_all_options, eval_single_model
 
 from literature_models.matsubara2022.wrapper import Matsubara2022
 
-def benchmark_model(model, input_shape):
-    device = torch.device("cuda")
+def benchmark_model(model, input_shape, device):
+
     model.to(device)
     input_shape = (1,) + input_shape
     dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
 
     # INIT LOGGERS
     starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
-    repetitions = 300
+    repetitions = 50
     timings=np.zeros((repetitions,1))
     #GPU-WARM-UP
     for _ in range(10):
@@ -43,6 +43,16 @@ def benchmark_model(model, input_shape):
 
 
 
-wrapper = Matsubara2022()
-input_shape = wrapper.get_input_shape()
-benchmark_model(wrapper.encoder, input_shape)
+# for name, wrapper_class, mode in get_all_options(dummy=False):
+#     print(name)
+#     wrapper = wrapper_class(mode=mode)
+#     wrapper.encoder.set_mode(mode)
+#     input_shape = wrapper.get_input_shape()
+#     benchmark_model(wrapper.encoder, input_shape,device=torch.device("cuda"))
+
+for name, wrapper_class, mode in get_all_options(dummy=False):
+    print(name)
+    wrapper = wrapper_class(mode=mode)
+    wrapper.encoder.set_mode(mode)
+    input_shape = wrapper.get_input_shape()
+    benchmark_model(wrapper.encoder, input_shape,device=torch.device("cpu"))

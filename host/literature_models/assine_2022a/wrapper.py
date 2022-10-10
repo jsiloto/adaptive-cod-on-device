@@ -21,6 +21,9 @@ class Assine2022A(BaseWrapper):
     def get_printname(self):
         return "assine2022a_{}".format(self.mode)
 
+    def get_input_shape(self):
+        return 3, 768, 768
+
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
         scripted.eval()
