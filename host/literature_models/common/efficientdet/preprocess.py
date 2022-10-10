@@ -97,11 +97,8 @@ def aspectaware_resize_padding2(image, width: int, height: int):
 
 def preprocess_for_torchscript(ori_imgs, max_size: int =512):
     ori_imgs = ori_imgs.permute(0, 2, 3, 1) # Channels last
-    device = ori_imgs.get_device()
-    if type(device) == int:
-        device = torch.device("cpu")
-    mean = torch.tensor((0.485, 0.456, 0.406)).to(device)
-    std = torch.tensor((0.229, 0.224, 0.225)).to(device)
+    mean = torch.tensor((0.485, 0.456, 0.406))
+    std = torch.tensor((0.229, 0.224, 0.225))
 
     # print(ori_imgs.shape)
     # ori_imgs = torch.flip(ori_imgs, dims=(3,))
@@ -109,7 +106,7 @@ def preprocess_for_torchscript(ori_imgs, max_size: int =512):
 
     ori_imgs = ori_imgs.permute(0, 3, 1, 2)  # Channels first
     ori_imgs = aspectaware_resize_padding2(ori_imgs, max_size, max_size)
-    return ori_imgs.to(device)
+    return ori_imgs
 
 
 def preprocess(ori_imgs, max_size=512, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)):

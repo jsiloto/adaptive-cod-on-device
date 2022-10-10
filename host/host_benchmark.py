@@ -9,6 +9,7 @@ import shutil
 import time
 import traceback
 from copy import copy
+from torch import jit
 from literature_models.model_wrapper import get_all_options, eval_single_model
 
 from literature_models.matsubara2022.wrapper import Matsubara2022
@@ -53,6 +54,8 @@ def benchmark_model(model, input_shape, device):
 for name, wrapper_class, mode in get_all_options(dummy=False):
     print(name)
     wrapper = wrapper_class(mode=mode)
-    wrapper.encoder.set_mode(mode)
     input_shape = wrapper.get_input_shape()
-    benchmark_model(wrapper.encoder, input_shape,device=torch.device("cpu"))
+    model_file = wrapper.generate_torchscript("./models")
+    model = jit.load(model_file)
+    model.set_mode(mode)
+    benchmark_model(model, input_shape,device=torch.device("cpu"))
