@@ -12,14 +12,15 @@ class Assine2022B(BaseWrapper):
     @classmethod
     def get_mode_options(cls):
         # Ensemblesize/numbits
-        return [14, 24, 34, 44, 11, 22, 33]
+        # return [14, 24, 34, 44, 11, 22, 33]
+        return [14, 24, 34, 44]
 
     def __init__(self, mode=None):
         if mode is None:
             mode = 44
         self.mode = mode
         encoder_builder = Assine2022BEncoder
-        self.encoder = Ensemble(encoder_builder)
+        self.encoder = Ensemble(encoder_builder, mode)
 
     def get_printname(self):
         return "assine2022b_{}".format(self.mode)

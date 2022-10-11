@@ -40,6 +40,7 @@ RUN pip install tensorboardX \
 
 
 RUN pip install torch_tb_profiler compressai
+RUN pip install apache-tvm
 
 ARG UID
 ARG GID

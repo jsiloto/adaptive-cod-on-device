@@ -6,9 +6,9 @@ from literature_models.common.efficientdet.preprocess import preprocess_for_torc
 
 
 class Ensemble(nn.Module):
-    def __init__(self, encoder_builder):
+    def __init__(self, encoder_builder, mode):
         super().__init__()
-        self.size: int = 4
+        self.size: int = mode // 10
         self.scale_factor: float = 0.5
 
         print("Building Ensemble of size {}, scale factor {}"
