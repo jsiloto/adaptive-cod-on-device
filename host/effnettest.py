@@ -1,0 +1,1 @@
+torchvision.models.efficientnet.EfficientNet

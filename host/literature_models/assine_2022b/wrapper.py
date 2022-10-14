@@ -26,7 +26,7 @@ class Assine2022B(BaseWrapper):
         return "assine2022b_{}".format(self.mode)
 
     def get_input_shape(self):
-        return 3, 640, 640
+        return 3, 768, 768
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
@@ -38,7 +38,7 @@ class Assine2022B(BaseWrapper):
 
     def generate_metrics(self):
         self.encoder.set_mode(mode=self.mode)
-        result = get_model_complexity_info(self.encoder, (3, 640, 640),
+        result = get_model_complexity_info(self.encoder, (3, 768, 768),
                                            print_per_layer_stat=False,
                                            as_strings=False)
         print(result)
