@@ -56,3 +56,8 @@ class Matsubara2022(BaseWrapper):
             5: (26.0, 8e3),
         }
         return results[mode]
+
+    def get_encoder(self, mode):
+        if mode not in self.encoders:
+            self.encoder[mode] = MatsubaraEntropicEncoder()
+        return self.encoder[mode]

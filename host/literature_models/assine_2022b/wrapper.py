@@ -65,3 +65,6 @@ class Assine2022B(BaseWrapper):
         }
         return results[mode]
 
+    def get_encoder(self, mode):
+        self.encoder.set_mode(mode)
+        return self.encoder

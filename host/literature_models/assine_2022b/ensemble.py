@@ -11,8 +11,8 @@ class Ensemble(nn.Module):
         self.size: int = mode // 10
         self.scale_factor: float = 0.5
 
-        print("Building Ensemble of size {}, scale factor {}"
-              .format(self.size, self.scale_factor))
+        # print("Building Ensemble of size {}, scale factor {}"
+        #       .format(self.size, self.scale_factor))
 
         self.models = nn.ModuleList([
             encoder_builder()

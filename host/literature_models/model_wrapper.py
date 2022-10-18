@@ -10,8 +10,8 @@ from literature_models.matsubara2022.wrapper import Matsubara2022
 
 wrapper_dict = {
     "dummy": Dummy,
-    "assine2022b": Assine2022B,
     "lee2021": Lee2021,
+    "assine2022b": Assine2022B,
     # "matsubara2022": Matsubara2022,
     # "assine2022a": Assine2022A,
 }

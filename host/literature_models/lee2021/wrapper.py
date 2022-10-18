@@ -17,6 +17,7 @@ class Lee2021(BaseWrapper):
     def __init__(self, mode: int = 3):
         self.mode: int = mode
         self.encoder = LeeYoloV5sEncoder(num_layers=self.mode)
+        self.encoders = {}
 
     def get_printname(self):
         return "lee2021_layer_{}".format(self.mode)
@@ -57,3 +58,9 @@ class Lee2021(BaseWrapper):
             10: (36.4, 4.7e3),
         }
         return results[mode]
+
+    def get_encoder(self, mode):
+        if mode not in self.encoders:
+            print("Cache miss")
+            self.encoders[mode] = LeeYoloV5sEncoder(num_layers=mode)
+        return self.encoders[mode]
