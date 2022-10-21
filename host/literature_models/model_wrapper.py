@@ -1,5 +1,5 @@
 import os
-
+from torch import jit
 
 from literature_models.assine_2022b.wrapper import Assine2022B
 from literature_models.assine_2022a.wrapper import Assine2022A
@@ -9,7 +9,7 @@ from literature_models.lee2021.wrapper import Lee2021
 from literature_models.matsubara2022.wrapper import Matsubara2022
 
 wrapper_dict = {
-    "dummy": Dummy,
+    # "dummy": Dummy,
     "lee2021": Lee2021,
     "assine2022b": Assine2022B,
     # "matsubara2022": Matsubara2022,
@@ -27,6 +27,13 @@ def get_all_options(dummy=True):
 
     return all_options
 
+
+def build_all_jit_models():
+    model_path = "./models"
+    os.makedirs(model_path, exist_ok=True)
+    for name, wrapper_class, mode in get_all_options(dummy=False):
+        wrapper = wrapper_class(mode=mode)
+        model_file = wrapper.generate_torchscript(model_path)
 
 def eval_single_model(model_class, mode, out_dir='output'):
     wrapper: BaseWrapper = model_class(mode=mode)

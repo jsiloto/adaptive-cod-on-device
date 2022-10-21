@@ -59,5 +59,5 @@ class Matsubara2022(BaseWrapper):
 
     def get_encoder(self, mode):
         if mode not in self.encoders:
-            self.encoder[mode] = MatsubaraEntropicEncoder()
+            self.encoders[mode] = torch.jit.load("./models/matsubara2022_{}.ptl".format(self.mode))
         return self.encoder[mode]

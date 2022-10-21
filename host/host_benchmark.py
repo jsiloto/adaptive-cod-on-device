@@ -16,7 +16,7 @@ from torch import jit
 import time
 
 from literature_models.base.base_wrapper import BaseWrapper
-from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict
+from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict, build_all_jit_models
 from torch.profiler import profile, record_function, ProfilerActivity
 from literature_models.matsubara2022.wrapper import Matsubara2022
 
@@ -59,15 +59,16 @@ def benchmark_model_inference(model, input_shape, device):
     return warmup_timings, experiment_timings
 
 
-def benchmark_model_switching(wrapper: BaseWrapper, device):
+def benchmark_model_switching(wrapperClass: BaseWrapper, device):
+    wrapper = wrapperClass()
     for i in range(4):
-        for mode in wrapper.get_mode_options():
+        for mode in wrapperClass.get_mode_options():
             bl = time.perf_counter()
             model = wrapper.get_encoder(mode)
             model.to(device)
-            al = 1000*(time.perf_counter() - bl)
+            al = round(1000*(time.perf_counter() - bl), 3)
             input_shape = wrapper.get_input_shape()
-            timings = exp(model, input_shape, 5, device)
+            timings = np.around(exp(model, input_shape, 10, device), decimals=2)
             print(mode, al, timings.tolist())
 
 
@@ -83,17 +84,9 @@ def main():
     torch.set_num_threads(args.cpus)
 
     # Generate all model
-    model_path = "./models"
-    os.makedirs(model_path, exist_ok=True)
-    # for name, wrapper_class, mode in get_all_options(dummy=False):
-    #     wrapper = wrapper_class(mode=mode)
-    #     model_file = wrapper.generate_torchscript(model_path)
-    #
-    #
-    # for name, wrapper_class in wrapper_dict.items():
-    #     model_file = wrapper.generate_torchscript(model_path)
-    #     model = jit.load(model_file)
-    #     benchmark_model_switching(wrapper, device)
+    build_all_jit_models()
+    for name, WrapperClass in wrapper_dict.items():
+        benchmark_model_switching(WrapperClass, device)
 
     for name, wrapper_class, mode in get_all_options(dummy=False):
         name = name + "_" + str(mode)
@@ -101,10 +94,7 @@ def main():
         wrapper = wrapper_class(mode=mode)
         input_shape = wrapper.get_input_shape()
         print(input_shape)
-        model_file = wrapper.generate_torchscript(model_path)
-        model = jit.load(model_file)
-        # model = wrapper.encoder
-        model.set_mode(mode)
+        model = wrapper.get_encoder(mode)
         warmup_timings, experiment_timings = benchmark_model_inference(model, input_shape, device)
         ms = np.average(experiment_timings)
         print(np.average(experiment_timings), np.std(experiment_timings))
