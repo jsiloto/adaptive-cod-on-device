@@ -25,16 +25,16 @@ class Ensemble(nn.Module):
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):
-        x = preprocess_for_torchscript(x, max_size=768)
-        output_list = []
+        # x = preprocess_for_torchscript(x, max_size=768)
+        # output_list = []
         x_ = torch.nn.functional.interpolate(
             x, scale_factor=[self.scale_factor, self.scale_factor], mode='nearest')
-        for i, m in enumerate(self.models):
-            if i < self.size:
-                y = m.forward(x_)
-                y = y*(2**(1-i))
-                output_list.append(y)
 
-        y = torch.sum(torch.stack(output_list), dim=0)
+        y = self.models[0].forward(x_)
+        for i, m in enumerate(self.models[1:]):
+            y_ = m.forward(x_)
+            y_ = y_ * (2 ** (1 - i))
+            y = y + y_
+
+        # y = torch.sum(torch.stack(output_list), dim=0)
         return y
-

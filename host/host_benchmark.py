@@ -90,14 +90,21 @@ def main():
 
     for name, wrapper_class, mode in get_all_options(dummy=False):
         name = name + "_" + str(mode)
+	model = wrapper.get_encoder(mode)
         print(name)
         wrapper = wrapper_class(mode=mode)
         input_shape = wrapper.get_input_shape()
-        print(input_shape)
-        model = wrapper.get_encoder(mode)
-        warmup_timings, experiment_timings = benchmark_model_inference(model, input_shape, device)
+        print(name, input_shape)
+
+        while (True):
+            warmup_timings, experiment_timings = benchmark_model_inference(model, input_shape, device)
+            avg, std = np.average(experiment_timings), np.std(experiment_timings)
+            print(avg, std)
+            if std < avg / 10:
+                break
+            else:
+                print("Unstable experiment -- Rerunning...")
         ms = np.average(experiment_timings)
-        print(np.average(experiment_timings), np.std(experiment_timings))
         map, kb = wrapper.get_reported_results(mode)
         d = {
             'model': name,
