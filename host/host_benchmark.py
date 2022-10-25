@@ -102,7 +102,7 @@ def main():
             warmup_timings, experiment_timings = benchmark_model_inference(model, input_shape, device)
             avg, std = np.average(experiment_timings), np.std(experiment_timings)
             print(avg, std)
-            if std < avg / 10:
+            if std < avg / 5:
                 break
             else:
                 print("Unstable experiment -- Rerunning...")

@@ -21,7 +21,7 @@ class Ensemble(nn.Module):
 
     @torch.jit.export
     def set_mode(self, mode: int):
-        self.size = int(mode / 10)
+        self.size = int(mode // 10)
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):
@@ -32,9 +32,10 @@ class Ensemble(nn.Module):
 
         y = self.models[0].forward(x_)
         for i, m in enumerate(self.models[1:]):
-            y_ = m.forward(x_)
-            y_ = y_ * (2 ** (1 - i))
-            y = y + y_
+            if i < self.size-1:
+                y_ = m.forward(x_)
+                y_ = y_ * (2 ** (1 - i))
+                y = y + y_
 
         # y = torch.sum(torch.stack(output_list), dim=0)
         return y
