@@ -49,8 +49,8 @@ def exp(model, input_shape, repetitions, device):
 
 
 def benchmark_model_inference(model, input_shape, device):
-    warmup_times = 70
-    experiment_times = 70
+    warmup_times = 50
+    experiment_times = 50
     model.to(device)
 
     # INIT LOGGERS
@@ -92,10 +92,9 @@ def main():
         exit()
 
     for name, wrapper_class, mode in get_all_options(dummy=False):
+        wrapper = wrapper_class(mode=mode)
         name = name + "_" + str(mode)
         model = wrapper.get_encoder(mode)
-        print(name)
-        wrapper = wrapper_class(mode=mode)
         input_shape = wrapper.get_input_shape()
         print(name, input_shape)
 
