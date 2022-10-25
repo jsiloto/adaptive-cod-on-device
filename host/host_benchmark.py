@@ -26,8 +26,8 @@ def get_argparser():
     argparser.add_argument('--cpus', type=int, required=True, help='Number of cpus')
     argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
     argparser.add_argument('-gpu', action='store_true', default=False, help='Experiment Name')
+    argparser.add_argument('-switching', action='store_true', default=False, help='Experiment Name')
     return argparser
-
 
 
 def exp(model, input_shape, repetitions, device):
@@ -47,14 +47,15 @@ def exp(model, input_shape, repetitions, device):
             timings[rep] = curr_time
     return timings
 
+
 def benchmark_model_inference(model, input_shape, device):
     warmup_times = 70
     experiment_times = 70
     model.to(device)
 
     # INIT LOGGERS
-    warmup_timings = exp(model, input_shape, warmup_times,  device)
-    experiment_timings = exp(model, input_shape, experiment_times,  device)
+    warmup_timings = exp(model, input_shape, warmup_times, device)
+    experiment_timings = exp(model, input_shape, experiment_times, device)
 
     return warmup_timings, experiment_timings
 
@@ -66,11 +67,10 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device):
             bl = time.perf_counter()
             model = wrapper.get_encoder(mode)
             model.to(device)
-            al = round(1000*(time.perf_counter() - bl), 3)
+            al = round(1000 * (time.perf_counter() - bl), 3)
             input_shape = wrapper.get_input_shape()
             timings = np.around(exp(model, input_shape, 10, device), decimals=2)
             print(mode, al, timings.tolist())
-
 
 
 def main():
@@ -85,12 +85,15 @@ def main():
 
     # Generate all model
     build_all_jit_models()
-    for name, WrapperClass in wrapper_dict.items():
-        benchmark_model_switching(WrapperClass, device)
+
+    if args.switching:
+        for name, WrapperClass in wrapper_dict.items():
+            benchmark_model_switching(WrapperClass, device)
+        exit()
 
     for name, wrapper_class, mode in get_all_options(dummy=False):
         name = name + "_" + str(mode)
-	model = wrapper.get_encoder(mode)
+        model = wrapper.get_encoder(mode)
         print(name)
         wrapper = wrapper_class(mode=mode)
         input_shape = wrapper.get_input_shape()
@@ -113,9 +116,6 @@ def main():
             'mAP': map
         }
         df = df.append(d, ignore_index=True)
-
-
-
 
     df = df.set_index("model")
     print(df)
