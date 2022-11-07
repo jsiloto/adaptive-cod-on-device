@@ -106,13 +106,13 @@ def main():
                 print("Unstable experiment -- Rerunning...")
         ms = np.average(experiment_timings)
         map, kb = wrapper.get_reported_results(mode)
-        d = {
+        d = pd.DataFrame({
             'model': name,
             'KB': kb,
             'ms': ms,
             'mAP': map
-        }
-        df = df.append(d, ignore_index=True)
+        }, columns=df.columns, index=[0])
+        df = pd.concat([df, d], ignore_index=True)
 
     df = df.set_index("model")
     print(df)

@@ -15,6 +15,7 @@ class Matsubara2022(BaseWrapper):
     def __init__(self, mode=None):
         self.mode = mode
         self.encoder = MatsubaraEntropicEncoder()
+        self.encoders = {}
 
     def get_printname(self):
         return "matsubara2022_{}".format(self.mode)
@@ -60,4 +61,4 @@ class Matsubara2022(BaseWrapper):
     def get_encoder(self, mode):
         if mode not in self.encoders:
             self.encoders[mode] = torch.jit.load("./models/matsubara2022_{}.ptl".format(self.mode))
-        return self.encoder[mode]
+        return self.encoders[mode]
