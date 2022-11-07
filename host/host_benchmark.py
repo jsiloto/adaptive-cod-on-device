@@ -2,6 +2,17 @@
 
 import argparse
 import os
+def get_argparser():
+    argparser = argparse.ArgumentParser(description='On Device Experiments')
+    argparser.add_argument('--cpus', type=int, required=True, help='Number of cpus')
+    argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
+    argparser.add_argument('-gpu', action='store_true', default=False, help='Experiment Name')
+    argparser.add_argument('-switching', action='store_true', default=False, help='Experiment Name')
+    return argparser
+args = get_argparser().parse_args()
+os.environ['OMP_NUM_THREADS']=str(args.cpus)
+os.environ['MKL_NUM_THREADS']=str(args.cpus)
+
 
 import numpy as np
 import torch
@@ -21,13 +32,7 @@ from torch.profiler import profile, record_function, ProfilerActivity
 from literature_models.matsubara2022.wrapper import Matsubara2022
 
 
-def get_argparser():
-    argparser = argparse.ArgumentParser(description='On Device Experiments')
-    argparser.add_argument('--cpus', type=int, required=True, help='Number of cpus')
-    argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
-    argparser.add_argument('-gpu', action='store_true', default=False, help='Experiment Name')
-    argparser.add_argument('-switching', action='store_true', default=False, help='Experiment Name')
-    return argparser
+
 
 
 def exp(model, input_shape, repetitions, device):
@@ -72,7 +77,6 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device):
 
 
 def main():
-    args = get_argparser().parse_args()
     df = pd.DataFrame(columns=['model', 'ms', 'KB', 'mAP'])
     device = "cpu"
     if args.gpu:

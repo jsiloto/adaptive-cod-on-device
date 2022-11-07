@@ -3,7 +3,7 @@ pandas
 numpy
 opencv-python
 tqdm
-torch==1.9.0
+torch
 webcolors
 torchvision==0.10.0
 compressai
