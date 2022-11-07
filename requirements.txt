@@ -1,0 +1,9 @@
+ptflops
+pandas
+numpy
+opencv-python
+tqdm
+webcolors
+torchvision
+compressai
+pyyaml
