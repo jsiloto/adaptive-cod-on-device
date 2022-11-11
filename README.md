@@ -1,4 +1,1 @@
 # adaptive-cod-on-device
-
-
-
