@@ -44,7 +44,7 @@ class BTClient(object):
     def send(self, kbytes):
 
         chunk = 512 # %kb chuncks
-        num_chunks = 1024*kbytes//chunk
+        num_chunks = int(1024*kbytes/chunk)
         t = ''.join(random.choices(string.ascii_uppercase +
                                    string.digits, k=chunk))
         tt = t.encode()

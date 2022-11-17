@@ -12,8 +12,8 @@ class Assine2022B(BaseWrapper):
     @classmethod
     def get_mode_options(cls):
         # Ensemblesize/numbits
-        # return [14, 24, 34, 44, 11, 22, 33]
-        return [14, 24, 34, 44]
+        return [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44]
+        #return [14, 24, 34, 44]
 
     def __init__(self, mode=None):
         if mode is None:
@@ -27,7 +27,7 @@ class Assine2022B(BaseWrapper):
         return "assine2022b_{}".format(self.mode)
 
     def get_input_shape(self):
-        return 3, 768, 768
+        return 1, 3, 384, 384
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
@@ -53,6 +53,10 @@ class Assine2022B(BaseWrapper):
 
     def get_reported_results(self, mode: int) -> (float, float):
         assert mode in self.get_mode_options()
+
+
+
+
         results = {
             14: (34.3, 27648.0),
             24: (36.1, 27648.0),

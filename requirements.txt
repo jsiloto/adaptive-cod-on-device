@@ -8,4 +8,4 @@ webcolors
 torchvision
 compressai
 pyyaml
-pybluez
+pybluez==0.22
