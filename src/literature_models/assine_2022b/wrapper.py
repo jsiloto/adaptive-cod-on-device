@@ -83,6 +83,23 @@ class Assine2022B(BaseWrapper):
         }
         return results[mode]
 
+    def get_best_mode(self, bandwidth, deadline):
+        single_compute_time=70.0 #ms
+
+        best = 11
+        best_map = 14.5
+        for mode, (map, kb) in self.get_reported_results().items():
+            compute_time = single_compute_time*(mode/10)
+            transmit_time = 1000*kb/bandwidth
+            if compute_time+transmit_time<deadline:
+                if map > best_map:
+                    best = mode
+                    best_map = map
+
+        return best
+
+
+
     def get_encoder(self, mode):
         model_file = "./models/assine2022b.ptl"
         if self.jit_encoder is None:
