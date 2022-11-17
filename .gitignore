@@ -1,4 +1,4 @@
-host/models/
+src/models/
 adaptive-cod/
 .idea/
 server/temp/
@@ -7,8 +7,8 @@ server/temp/
 *.jpg
 *.png
 android-device/.gradle/
-host/experiment_manager/experiment-results/
-host/out/
+src/experiment_manager/experiment-results/
+src/out/
 
 
 # Byte-compiled / optimized / DLL files
