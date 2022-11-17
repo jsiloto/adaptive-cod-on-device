@@ -8,7 +8,7 @@ from literature_models.common.analyzer.hooks import custom_module_mapping
 class Assine2022A(BaseWrapper):
 
     @classmethod
-    def get_mode_options(cls):
+    def get_mode_options(cls, reduced=False):
         # Ensemblesize/numbits
         return [25, 50, 75, 100]
 

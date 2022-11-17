@@ -10,9 +10,12 @@ from literature_models.base.base_wrapper import BaseWrapper
 class Assine2022B(BaseWrapper):
 
     @classmethod
-    def get_mode_options(cls):
+    def get_mode_options(cls, reduced=False):
         # Ensemblesize/numbits
-        return [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44]
+        if reduced:
+            return [14, 24, 34, 44]
+        else:
+            return [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44]
         # return [14, 24, 34, 44]
 
     def __init__(self, mode=None):

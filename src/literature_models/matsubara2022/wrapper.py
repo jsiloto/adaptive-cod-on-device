@@ -9,9 +9,12 @@ from literature_models.matsubara2022.encoder import MatsubaraEntropicEncoder
 class Matsubara2022(BaseWrapper):
 
     @classmethod
-    def get_mode_options(cls):
-        # return [1, 2, 3, 4, 5]
-        return [1]
+    def get_mode_options(cls, reduced=False):
+        if reduced:
+            return [1]
+        else:
+            return [1, 2, 3, 4, 5]
+
     def __init__(self, mode=None):
         self.mode = mode
         self.encoder = MatsubaraEntropicEncoder()

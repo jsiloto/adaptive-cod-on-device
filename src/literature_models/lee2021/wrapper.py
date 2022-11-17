@@ -11,7 +11,7 @@ from literature_models.lee2021.encoder import LeeYoloV5sEncoder
 class Lee2021(BaseWrapper):
 
     @classmethod
-    def get_mode_options(cls) -> List[int]:
+    def get_mode_options(cls, reduced=False) -> List[int]:
         return [3, 5, 7, 10]
 
     def __init__(self, mode: int = 3):
