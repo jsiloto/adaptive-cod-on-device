@@ -5,6 +5,7 @@ opencv-python
 tqdm
 torch
 webcolors
-torchvision==0.10.0
+torchvision
 compressai
 pyyaml
+pybluez
