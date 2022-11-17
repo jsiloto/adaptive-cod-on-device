@@ -9,7 +9,7 @@ class Assine2022A(BaseWrapper):
 
     @classmethod
     def get_mode_options(cls, reduced=False):
-        # Ensemblesize/numbits
+        # alpha
         return [25, 50, 75, 100]
 
     def __init__(self, mode=None):

@@ -13,7 +13,7 @@ wrapper_dict = {
     "assine2022b": Assine2022B,
     "lee2021": Lee2021,
     "matsubara2022": Matsubara2022,
-    # "assine2022a": Assine2022A,
+    "assine2022a": Assine2022A,
 }
 
 def get_all_options(dummy=True, reduced=True):
