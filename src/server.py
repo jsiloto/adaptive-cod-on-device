@@ -9,7 +9,7 @@ def main():
     device = torch.device(device)
     model = get_decoder()
     model.to(device)
-    input_shape = (6, 96, 96)
+    input_shape = (1, 6, 96, 96)
     dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
     def callback():
         model(dummy_input)
