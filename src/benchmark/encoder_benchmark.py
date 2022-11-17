@@ -2,11 +2,17 @@
 
 import argparse
 import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+
 def get_argparser():
     argparser = argparse.ArgumentParser(description='On Device Experiments')
     argparser.add_argument('--cpus', type=int, required=True, help='Number of cpus')
     argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
-    argparser.add_argument('-gpu', action='store_true', default=False, help='Experiment Name')
     argparser.add_argument('-switching', action='store_true', default=False, help='Experiment Name')
     return argparser
 args = get_argparser().parse_args()
@@ -29,7 +35,6 @@ import time
 from literature_models.base.base_wrapper import BaseWrapper
 from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict, build_all_jit_models
 from torch.profiler import profile, record_function, ProfilerActivity
-from literature_models.matsubara2022.wrapper import Matsubara2022
 
 
 
@@ -79,8 +84,6 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device):
 def main():
     df = pd.DataFrame(columns=['model', 'ms', 'KB', 'mAP'])
     device = "cpu"
-    if args.gpu:
-        device = "cuda"
     device = torch.device(device)
     torch.set_num_interop_threads(args.cpus)
     torch.set_num_threads(args.cpus)
