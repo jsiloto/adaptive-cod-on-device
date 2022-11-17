@@ -55,7 +55,7 @@ def benchmark_model_switching(name):
                 print("Peak Ram: {}".format(peak_ram_use-baseline_ram))
 
             # Test if a cache miss occurred
-            if disk_load > timings[-1]:
+            if disk_load > 50:
                 warmup = timings[0]+timings[1]
                 result_list += [{"name": name, "mode": mode, "disk_load": disk_load, "warmup": warmup}]
 
