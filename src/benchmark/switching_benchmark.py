@@ -33,7 +33,7 @@ def get_argparser():
 
 def benchmark_model_switching(name):
     baseline_ram = psutil.virtual_memory()[3] / 1e9
-    print("Ram USE: {}".format(baseline_ram))
+    print("Baseline Ram USE: {}".format(baseline_ram))
     device = "cpu"
     device = torch.device(device)
     WrapperClass = wrapper_dict[name]
@@ -50,11 +50,10 @@ def benchmark_model_switching(name):
             al = round(1000 * (time.perf_counter() - bl), 3)
             input_shape = wrapper.get_input_shape()
             timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2).T[0]
-
-            print("Ram USE: {}".format(psutil.virtual_memory()[3] / 1e9))
             ram_use = psutil.virtual_memory()[3] / 1e9
             if ram_use > peak_ram_use:
                 peak_ram_use = ram_use
+                print("Peak Ram: {}".format(peak_ram_use-baseline_ram))
 
             result_list += [{"name": name, "mode": mode, "disk_load": al, "timings": timings.tolist()}]
 
@@ -67,7 +66,6 @@ def benchmark_model_switching(name):
 
 def main():
     args = get_argparser().parse_args()
-
     torch.set_num_interop_threads(1)
     torch.set_num_threads(args.cpus)
     # Generate all model
@@ -79,6 +77,7 @@ def main():
             continue
         process = mp.Process(target=benchmark_model_switching, args=(name, ))
         process.run()
+
         print(process.is_alive())
         process.close()
         time.sleep(20)
