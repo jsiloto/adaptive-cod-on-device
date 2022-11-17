@@ -26,8 +26,11 @@ class Assine2022B(BaseWrapper):
     def get_printname(self):
         return "assine2022b_{}".format(self.mode)
 
-    def get_input_shape(self):
-        return 1, 3, 384, 384
+    def get_input_shape(self, unsqueeze=False):
+        if unsqueeze:
+            return 1, 3, 384, 384
+        else:
+            return 3, 384, 384
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
@@ -39,7 +42,7 @@ class Assine2022B(BaseWrapper):
 
     def generate_metrics(self):
         self.encoder.set_mode(mode=self.mode)
-        result = get_model_complexity_info(self.encoder, (3, 768, 768),
+        result = get_model_complexity_info(self.encoder, self.get_input_shape(),
                                            print_per_layer_stat=False,
                                            as_strings=False)
         print(result)

@@ -20,8 +20,11 @@ class Matsubara2022(BaseWrapper):
     def get_printname(self):
         return "matsubara2022_{}".format(self.mode)
 
-    def get_input_shape(self):
-        return 3, 800, 800
+    def get_input_shape(self, unsqueeze=False):
+        if unsqueeze:
+            return 1, 3, 800, 800
+        else:
+            return 3, 800, 800
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)

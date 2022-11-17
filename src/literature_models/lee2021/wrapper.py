@@ -22,8 +22,11 @@ class Lee2021(BaseWrapper):
     def get_printname(self):
         return "lee2021_layer_{}".format(self.mode)
 
-    def get_input_shape(self):
-        return 3, 640, 640
+    def get_input_shape(self, unsqueeze=False):
+        if unsqueeze:
+            return 1, 3, 640, 640
+        else:
+            return 3, 640, 640
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
