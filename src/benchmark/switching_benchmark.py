@@ -1,6 +1,7 @@
 # Modified from https://deci.ai/blog/measure-inference-time-deep-neural-networks/
 
 import argparse
+import json
 import os
 import sys
 import inspect
@@ -30,7 +31,7 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device, name):
     wrapper = wrapperClass()
     results = {}
     for i in range(4):
-        for mode in wrapperClass.get_mode_options():
+        for mode in wrapperClass.get_mode_options(reduced=True):
             bl = time.perf_counter()
             model = wrapper.get_encoder(mode)
             model.to(device)
@@ -56,16 +57,16 @@ def main():
     build_all_jit_models()
 
     results = {"baseline_ram": baseline_ram}
-    if args.switching:
-        for name, WrapperClass in wrapper_dict.items():
-            if name == "dummy":
-                continue
-            print("Ram USE: {}".format(psutil.virtual_memory()[3]/1e9))
-            r = benchmark_model_switching(WrapperClass, device, name)
-            results.update(r)
+
+    for name, WrapperClass in wrapper_dict.items():
+        if name == "dummy":
+            continue
+        print("Ram USE: {}".format(psutil.virtual_memory()[3]/1e9))
+        r = benchmark_model_switching(WrapperClass, device, name)
+        results.update(r)
 
     with open("switching_result.json", "w") as outfile:
-        outfile.write(results)
+        json.dump(results, outfile)
 
 
 if __name__ == "__main__":
