@@ -1,9 +1,7 @@
 import torch
 
-from bluetooth.bt import BTServer
+from btcomm.bt import BTServer
 from literature_models.assine_2022b.decoder import get_decoder
-
-
 
 def main():
     # Load Model

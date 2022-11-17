@@ -4,7 +4,7 @@ import time
 
 import torch
 
-from bluetooth.bt import BTClient
+from btcomm.bt import BTClient
 from literature_models.assine_2022b.wrapper import Assine2022B
 
 
