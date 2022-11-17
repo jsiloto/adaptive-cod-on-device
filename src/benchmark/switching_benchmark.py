@@ -15,6 +15,8 @@ from benchmark.timing import cpu_exp
 import psutil
 import time
 # from memory_profiler import memory_usage
+import gc
+
 
 from literature_models.base.base_wrapper import BaseWrapper
 from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict, build_all_jit_models
@@ -39,6 +41,7 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device, name):
             input_shape = wrapper.get_input_shape()
             timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2)
             results[name+str(mode)] = {"disk_load": al, "timings": timings.tolist()}
+            print("Model {}, mode {}".format(name, mode))
             print("Ram USE: {}".format(psutil.virtual_memory()[3] / 1e9))
     return results
 
@@ -55,10 +58,11 @@ def main():
 
     # Generate all model
     build_all_jit_models()
-
+    gc.collect()
     results = {"baseline_ram": baseline_ram}
 
     for name, WrapperClass in wrapper_dict.items():
+        gc.collect()
         if name == "dummy":
             continue
         print("Ram USE: {}".format(psutil.virtual_memory()[3]/1e9))
