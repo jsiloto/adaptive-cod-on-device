@@ -1,0 +1,10 @@
+ptflops
+pandas
+numpy
+opencv-python
+tqdm
+torch
+webcolors
+torchvision==0.10.0
+compressai
+pyyaml

@@ -8,6 +8,10 @@ class BaseWrapper():
     def get_mode_options(cls) -> List[int]:
         return cls.get_mode_options()
 
+    def get_input_shape(self) -> (int, int, int):
+        raise NotImplementedError()
+
+
     def get_printname(self) -> str:
         raise NotImplementedError()
 
@@ -19,3 +23,7 @@ class BaseWrapper():
 
     def generate_metrics(self):
         raise NotImplementedError("Should return a dictionary with metrics data")
+
+
+    def get_encoder(self, mode):
+        raise NotImplementedError("Should return an initialized encoder model")

@@ -12,29 +12,34 @@ class Assine2022B(BaseWrapper):
     @classmethod
     def get_mode_options(cls):
         # Ensemblesize/numbits
-        return [14, 24, 34, 44, 11, 22, 33]
+        # return [14, 24, 34, 44, 11, 22, 33]
+        return [14, 24, 34, 44]
 
     def __init__(self, mode=None):
         if mode is None:
             mode = 44
         self.mode = mode
         encoder_builder = Assine2022BEncoder
-        self.encoder = Ensemble(encoder_builder)
+        self.encoder = Ensemble(encoder_builder, mode)
+        self.jit_encoder = None
 
     def get_printname(self):
         return "assine2022b_{}".format(self.mode)
 
+    def get_input_shape(self):
+        return 3, 768, 768
+
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
         scripted.eval()
-        output_name = "{}.ptl".format(self.get_printname())
+        output_name = "assine2022b.ptl".format(self.get_printname())
         out_file = os.path.join(out_dir, output_name)
         scripted._save_for_lite_interpreter(out_file)
         return out_file
 
     def generate_metrics(self):
         self.encoder.set_mode(mode=self.mode)
-        result = get_model_complexity_info(self.encoder, (3, 640, 640),
+        result = get_model_complexity_info(self.encoder, (3, 768, 768),
                                            print_per_layer_stat=False,
                                            as_strings=False)
         print(result)
@@ -61,3 +66,10 @@ class Assine2022B(BaseWrapper):
         }
         return results[mode]
 
+    def get_encoder(self, mode):
+        if self.jit_encoder is None:
+            print("Model cache miss")
+            self.jit_encoder = torch.jit.load("./models/assine2022b.ptl")
+
+        self.jit_encoder.set_mode(mode)
+        return self.jit_encoder

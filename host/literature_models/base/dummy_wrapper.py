@@ -18,6 +18,9 @@ class Dummy(BaseWrapper):
     def get_printname(self):
         return "dummy"
 
+    def get_input_shape(self) -> (int, int, int):
+        return 3, 600, 600
+
     def generate_torchscript(self, out_dir) -> str:
         return ""
 

@@ -51,5 +51,5 @@ def parse_model(d, num_layers=5):  # model_dict, input_channels(3)
         ch.append(c2)
 
     layers = layers[:num_layers+1]
-    print("Num layers ", len(layers))
+    # print("Num layers ", len(layers))
     return nn.Sequential(*layers), sorted(save)

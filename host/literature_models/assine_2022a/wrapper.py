@@ -17,14 +17,18 @@ class Assine2022A(BaseWrapper):
             mode = 44
         self.mode = mode
         self.encoder = Assine2022AEncoder()
+        self.jit_encoder = None
 
     def get_printname(self):
         return "assine2022a_{}".format(self.mode)
 
+    def get_input_shape(self):
+        return 3, 768, 768
+
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
         scripted.eval()
-        output_name = "assine2022a_{}.ptl".format(self.mode)
+        output_name = "assine2022a.ptl"
         out_file = os.path.join(out_dir, output_name)
         scripted._save_for_lite_interpreter(out_file)
         return out_file
@@ -55,3 +59,10 @@ class Assine2022A(BaseWrapper):
 
         return results[mode]
 
+    def get_encoder(self, mode):
+        if self.jit_encoder is None:
+            print("Model cache miss")
+            self.jit_encoder = torch.jit.load("./models/assine2022a.ptl")
+
+        self.jit_encoder.set_mode(mode)
+        return self.jit_encoder

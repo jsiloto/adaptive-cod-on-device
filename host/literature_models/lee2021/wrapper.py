@@ -17,9 +17,13 @@ class Lee2021(BaseWrapper):
     def __init__(self, mode: int = 3):
         self.mode: int = mode
         self.encoder = LeeYoloV5sEncoder(num_layers=self.mode)
+        self.encoders = {}
 
     def get_printname(self):
         return "lee2021_layer_{}".format(self.mode)
+
+    def get_input_shape(self):
+        return 3, 640, 640
 
     def generate_torchscript(self, out_dir) -> str:
         scripted = torch.jit.script(self.encoder)
@@ -54,3 +58,9 @@ class Lee2021(BaseWrapper):
             10: (36.4, 4.7e3),
         }
         return results[mode]
+
+    def get_encoder(self, mode):
+        if mode not in self.encoders:
+            print("Model cache miss")
+            self.encoders[mode] = torch.jit.load("./models/lee2021_layer_{}.ptl".format(self.mode))
+        return self.encoders[mode]
