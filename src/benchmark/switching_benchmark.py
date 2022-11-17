@@ -63,6 +63,7 @@ def main():
 
     for name, WrapperClass in wrapper_dict.items():
         gc.collect()
+        print(gc.get_stats())
         if name == "dummy":
             continue
         print("Ram USE: {}".format(psutil.virtual_memory()[3]/1e9))
