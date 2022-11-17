@@ -31,29 +31,26 @@ def get_argparser():
     return argparser
 
 
-def benchmark_model_switching(name, cpus):
+def benchmark_model_switching(name):
     baseline_ram = psutil.virtual_memory()[3] / 1e9
     print("Ram USE: {}".format(baseline_ram))
     device = "cpu"
     device = torch.device(device)
-    torch.set_num_interop_threads(1)
-    torch.set_num_threads(cpus)
     WrapperClass = wrapper_dict[name]
     wrapper = WrapperClass()
     results = {}
     peak_ram_use = 0
     result_list = []
-    for i in range(4):
+    for i in range(2):
         for mode in wrapper_dict[name].get_mode_options(reduced=True):
-            print(mode)
+            print("Model {}, mode {}".format(name, mode))
             bl = time.perf_counter()
             model = wrapper.get_encoder(mode)
             model.to(device)
             al = round(1000 * (time.perf_counter() - bl), 3)
             input_shape = wrapper.get_input_shape()
-            timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2)
+            timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2).T
 
-            print("Model {}, mode {}".format(name, mode))
             print("Ram USE: {}".format(psutil.virtual_memory()[3] / 1e9))
             ram_use = psutil.virtual_memory()[3] / 1e9
             if ram_use > peak_ram_use:
@@ -71,6 +68,8 @@ def benchmark_model_switching(name, cpus):
 def main():
     args = get_argparser().parse_args()
 
+    torch.set_num_interop_threads(1)
+    torch.set_num_threads(args.cpus)
     # Generate all model
     build_all_jit_models()
     gc.collect()
@@ -78,9 +77,10 @@ def main():
     for name, _ in wrapper_dict.items():
         if name == "dummy":
             continue
-        process = multiprocessing.Process(target=benchmark_model_switching, args=(name, args.cpus))
+        process = multiprocessing.Process(target=benchmark_model_switching, args=(name, ))
         process.run()
-        process.join()
+        process.terminate()
+        time.sleep(5)
 
 if __name__ == "__main__":
     main()
