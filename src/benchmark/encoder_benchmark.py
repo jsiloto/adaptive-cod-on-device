@@ -5,6 +5,8 @@ import os
 import sys
 import inspect
 
+from benchmark.timing import cpu_exp
+
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
@@ -13,8 +15,8 @@ def get_argparser():
     argparser = argparse.ArgumentParser(description='On Device Experiments')
     argparser.add_argument('--cpus', type=int, required=True, help='Number of cpus')
     argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
-    argparser.add_argument('-switching', action='store_true', default=False, help='Experiment Name')
     return argparser
+
 args = get_argparser().parse_args()
 os.environ['OMP_NUM_THREADS']=str(args.cpus)
 os.environ['MKL_NUM_THREADS']=str(args.cpus)
@@ -23,37 +25,8 @@ os.environ['MKL_NUM_THREADS']=str(args.cpus)
 import numpy as np
 import torch
 import pandas as pd
-import json
-import random
-import shutil
-import time
-import traceback
-from copy import copy
-from torch import jit
-import time
-
-from literature_models.base.base_wrapper import BaseWrapper
 from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict, build_all_jit_models
-from torch.profiler import profile, record_function, ProfilerActivity
 
-
-
-
-
-def exp(model, input_shape, repetitions, device):
-    input_shape = (repetitions,) + input_shape
-    dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
-    timings = np.zeros((repetitions, 1))
-    # MEASURE PERFORMANCE
-    with torch.no_grad():
-        for rep in range(repetitions):
-            start = time.time()
-            _ = model(torch.unsqueeze(dummy_input[rep], dim=0))
-            end = time.time()
-            # WAIT FOR GPU SYNC
-            curr_time = end-start
-            timings[rep] = curr_time*1000
-    return timings
 
 
 def benchmark_model_inference(model, input_shape, device):
@@ -62,23 +35,11 @@ def benchmark_model_inference(model, input_shape, device):
     model.to(device)
 
     # INIT LOGGERS
-    warmup_timings = exp(model, input_shape, warmup_times, device)
-    experiment_timings = exp(model, input_shape, experiment_times, device)
+    warmup_timings = cpu_exp(model, input_shape, warmup_times, device)
+    experiment_timings = cpu_exp(model, input_shape, experiment_times, device)
 
     return warmup_timings, experiment_timings
 
-
-def benchmark_model_switching(wrapperClass: BaseWrapper, device):
-    wrapper = wrapperClass()
-    for i in range(4):
-        for mode in wrapperClass.get_mode_options():
-            bl = time.perf_counter()
-            model = wrapper.get_encoder(mode)
-            model.to(device)
-            al = round(1000 * (time.perf_counter() - bl), 3)
-            input_shape = wrapper.get_input_shape()
-            timings = np.around(exp(model, input_shape, 10, device), decimals=2)
-            print(mode, al, timings.tolist())
 
 
 def main():
@@ -90,11 +51,6 @@ def main():
 
     # Generate all model
     build_all_jit_models()
-
-    if args.switching:
-        for name, WrapperClass in wrapper_dict.items():
-            benchmark_model_switching(WrapperClass, device)
-        exit()
 
     for name, wrapper_class, mode in get_all_options(dummy=False):
         wrapper = wrapper_class(mode=mode)
