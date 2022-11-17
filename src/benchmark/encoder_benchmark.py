@@ -18,8 +18,8 @@ def get_argparser():
     return argparser
 
 args = get_argparser().parse_args()
-os.environ['OMP_NUM_THREADS']=str(args.cpus)
-os.environ['MKL_NUM_THREADS']=str(args.cpus)
+# os.environ['OMP_NUM_THREADS']=str(args.cpus)
+# os.environ['MKL_NUM_THREADS']=str(args.cpus)
 
 
 import numpy as np
@@ -46,7 +46,7 @@ def main():
     df = pd.DataFrame(columns=['model', 'ms', 'KB', 'mAP'])
     device = "cpu"
     device = torch.device(device)
-    torch.set_num_interop_threads(args.cpus)
+    torch.set_num_interop_threads(1)
     torch.set_num_threads(args.cpus)
 
     # Generate all model
