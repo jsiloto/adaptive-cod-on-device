@@ -1,7 +1,8 @@
 import argparse
 import os
+import shutil
 import time
-
+import jsonlines
 import torch
 
 from btcomm.bt import BTClient
@@ -27,15 +28,21 @@ def main():
     input_shape = wrapper.get_input_shape(unsqueeze=True)
     device = torch.device("cpu")
 
+    result_file = "./bt_results.jsonl"
+    shutil.rmtree(result_file, ignore_errors=True)
+
+
 # Connect BT
     bt_client = BTClient(args.addr)
     start = time.time()
     bw_moving_average = 200
+    writer = jsonlines.open('output.jsonl', mode='w')
     while time.time() - start < args.seconds:
         e2e_start = time.time()
         dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
         model(dummy_input)
-        print("Model time", time.time()-e2e_start)
+        model_time = time.time()-e2e_start
+        print("Model time", model_time)
         kbs = wrapper.get_reported_results(mode)[1]/1000.0
         rtt_time = bt_client.send(kbs)
         expected_server_time = 0.060
@@ -49,7 +56,21 @@ def main():
 
         mode = wrapper.get_best_mode(bw_moving_average, args.deadline)
         model = wrapper.get_encoder(mode)
-        print("Setting Mode/MaP: {}/{}".format(mode, wrapper.results[mode]))
+        mAP, kbs = wrapper.results[mode]
+        print("Setting Mode/MaP: {}/{}".format(mode, mAP))
+
+
+        results ={
+            "bw": bw_moving_average,
+            "e2e": 1000*e2e,
+            "mode": mode,
+            "map": mAP,
+            "model_time": model_time,
+            "kbs": kbs/1000
+        }
+
+        writer.write(results)
+
 
 if __name__ == "__main__":
     main()

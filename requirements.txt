@@ -10,3 +10,4 @@ compressai
 pyyaml
 pybluez==0.22
 memory_profiler
+jsonlines
