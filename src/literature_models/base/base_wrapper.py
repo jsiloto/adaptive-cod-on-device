@@ -5,8 +5,8 @@ from torch import nn
 class BaseWrapper():
 
     @classmethod
-    def get_mode_options(cls) -> List[int]:
-        return cls.get_mode_options()
+    def get_mode_options(cls, reduced=False) -> List[int]:
+        return cls.get_mode_options(reduced=reduced)
 
     def get_input_shape(self) -> (int, int, int):
         raise NotImplementedError()

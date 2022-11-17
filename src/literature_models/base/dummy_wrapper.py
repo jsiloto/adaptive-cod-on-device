@@ -9,7 +9,7 @@ from literature_models.matsubara2022.encoder import MatsubaraEntropicEncoder
 class Dummy(BaseWrapper):
 
     @classmethod
-    def get_mode_options(cls):
+    def get_mode_options(cls, reduced=False):
         return [1, 2, 3]
 
     def __init__(self, mode=None):
