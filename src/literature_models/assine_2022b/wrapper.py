@@ -67,8 +67,12 @@ class Assine2022B(BaseWrapper):
         return results[mode]
 
     def get_encoder(self, mode):
+        model_file = "./models/assine2022b.ptl"
         if self.jit_encoder is None:
             print("Model cache miss")
+            if not os.path.isfile(model_file):
+                print("Model file miss")
+                self.generate_torchscript("./models/")
             self.jit_encoder = torch.jit.load("./models/assine2022b.ptl")
 
         self.jit_encoder.set_mode(mode)

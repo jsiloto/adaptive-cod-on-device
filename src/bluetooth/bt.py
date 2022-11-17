@@ -63,13 +63,13 @@ class BTClient(object):
 
 class BTServer(object):
 
-    def __init__(self):
+    def __init__(self, callback):
         self.server_sock = BluetoothSocket(RFCOMM)
         self.server_sock.bind(("", PORT_ANY))
         self.server_sock.listen(1)
         self.port = self.server_sock.getsockname()[1]
         self.uuid = uuid
-        self.callback = None
+        self.callback = callback
 
 
     def run(self):
