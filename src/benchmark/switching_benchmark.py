@@ -38,8 +38,9 @@ from literature_models.base.base_wrapper import BaseWrapper
 from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict, build_all_jit_models
 from torch.profiler import profile, record_function, ProfilerActivity
 
-def benchmark_model_switching(wrapperClass: BaseWrapper, device):
+def benchmark_model_switching(wrapperClass: BaseWrapper, device, name):
     wrapper = wrapperClass()
+    results = {}
     for i in range(4):
         for mode in wrapperClass.get_mode_options():
             bl = time.perf_counter()
@@ -48,11 +49,12 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device):
             al = round(1000 * (time.perf_counter() - bl), 3)
             input_shape = wrapper.get_input_shape()
             timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2)
-            print(mode, al, timings.tolist())
+            results[name+str(mode)] = (al, timings.tolist())
+    return results
 
 
 def main():
-    df = pd.DataFrame(columns=['model', 'ms', 'KB', 'mAP'])
+    df = pd.DataFrame(columns=['model', 'disk_load', 'timings'])
     device = "cpu"
     device = torch.device(device)
     torch.set_num_interop_threads(args.cpus)
@@ -61,24 +63,16 @@ def main():
     # Generate all model
     build_all_jit_models()
 
+    results = {}
     if args.switching:
         for name, WrapperClass in wrapper_dict.items():
-            benchmark_model_switching(WrapperClass, device)
-        exit()
+            if name == "dummy":
+                continue
+            r = benchmark_model_switching(WrapperClass, device, name)
+            results.update(r)
 
-    map, kb = wrapper.get_reported_results(mode)
-    d = pd.DataFrame({
-        'model': name,
-        'KB': kb,
-        'ms': ms,
-        'mAP': map
-    }, columns=df.columns, index=[0])
-    df = pd.concat([df, d], ignore_index=True)
-
-    df = df.set_index("model")
-    print(df)
-    filename = "./models/" + args.name + "_cpus{}.csv".format(args.cpus)
-    df.to_csv(filename)
+    with open("switching_result.json", "w") as outfile:
+        outfile.write(results)
 
 
 if __name__ == "__main__":
