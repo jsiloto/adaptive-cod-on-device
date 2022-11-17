@@ -13,6 +13,7 @@ import pandas as pd
 from benchmark.timing import cpu_exp
 import psutil
 import time
+# from memory_profiler import memory_usage
 
 from literature_models.base.base_wrapper import BaseWrapper
 from literature_models.model_wrapper import get_all_options, eval_single_model, wrapper_dict, build_all_jit_models
@@ -37,6 +38,7 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device, name):
             input_shape = wrapper.get_input_shape()
             timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2)
             results[name+str(mode)] = {"disk_load": al, "timings": timings.tolist()}
+            print("Ram USE: {}".format(psutil.virtual_memory()[3] / 1e9))
     return results
 
 
@@ -47,14 +49,18 @@ def main():
     torch.set_num_interop_threads(1)
     torch.set_num_threads(args.cpus)
 
+    baseline_ram = psutil.virtual_memory()[3]/1e9
+
+
     # Generate all model
     build_all_jit_models()
 
-    results = {}
+    results = {"baseline_ram": baseline_ram}
     if args.switching:
         for name, WrapperClass in wrapper_dict.items():
             if name == "dummy":
                 continue
+            print("Ram USE: {}".format(psutil.virtual_memory()[3]/1e9))
             r = benchmark_model_switching(WrapperClass, device, name)
             results.update(r)
 
