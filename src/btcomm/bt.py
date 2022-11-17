@@ -52,14 +52,14 @@ class BTClient(object):
         start = time.time()
         for i in range(num_chunks):
             self.sock.send(tt)
-
         self.sock.send(end_token.encode())
+
         d = ""
         while end_token not in d:
             d += self.sock.recv(96).decode()
         end = time.time()
-        print(end - start)
-        return d
+        rtt_time = end - start
+        return rtt_time
 
 class BTServer(object):
 
