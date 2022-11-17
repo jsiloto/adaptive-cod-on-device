@@ -2,7 +2,7 @@
 
 import argparse
 import json
-import multiprocessing
+import torch.multiprocessing as mp
 import os
 import sys
 import inspect
@@ -49,7 +49,7 @@ def benchmark_model_switching(name):
             model.to(device)
             al = round(1000 * (time.perf_counter() - bl), 3)
             input_shape = wrapper.get_input_shape()
-            timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2).T
+            timings = np.around(cpu_exp(model, input_shape, 10, device), decimals=2).T[0]
 
             print("Ram USE: {}".format(psutil.virtual_memory()[3] / 1e9))
             ram_use = psutil.virtual_memory()[3] / 1e9
@@ -77,10 +77,11 @@ def main():
     for name, _ in wrapper_dict.items():
         if name == "dummy":
             continue
-        process = multiprocessing.Process(target=benchmark_model_switching, args=(name, ))
+        process = mp.Process(target=benchmark_model_switching, args=(name, ))
         process.run()
-        process.terminate()
-        time.sleep(5)
+        print(process.is_alive())
+        process.close()
+        time.sleep(20)
 
 if __name__ == "__main__":
     main()
