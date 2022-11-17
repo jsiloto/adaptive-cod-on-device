@@ -68,7 +68,7 @@ def benchmark_model_switching(name, cpus):
 
 def main():
     args = get_argparser().parse_args()
-
+    
     # Generate all model
     build_all_jit_models()
     gc.collect()
@@ -76,7 +76,7 @@ def main():
     for name, _ in wrapper_dict.items():
         if name == "dummy":
             continue
-        process = multiprocessing.Process(target=benchmark_model_switching, args=(name, args.cpu))
+        process = multiprocessing.Process(target=benchmark_model_switching, args=(name, args.cpus))
         process.run()
         process.join()
 
