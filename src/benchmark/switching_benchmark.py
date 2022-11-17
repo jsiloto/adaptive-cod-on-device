@@ -44,6 +44,7 @@ def benchmark_model_switching(name, cpus):
     result_list = []
     for i in range(4):
         for mode in wrapper_dict[name].get_mode_options(reduced=True):
+            print(mode)
             bl = time.perf_counter()
             model = wrapper.get_encoder(mode)
             model.to(device)
@@ -68,7 +69,7 @@ def benchmark_model_switching(name, cpus):
 
 def main():
     args = get_argparser().parse_args()
-    
+
     # Generate all model
     build_all_jit_models()
     gc.collect()
