@@ -38,7 +38,8 @@ def benchmark_model_switching(name, cpus):
     device = torch.device(device)
     torch.set_num_interop_threads(1)
     torch.set_num_threads(cpus)
-    wrapper = wrapper_dict[name]
+    WrapperClass = wrapper_dict[name]
+    wrapper = WrapperClass()
     results = {}
     peak_ram_use = 0
     result_list = []
