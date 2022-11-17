@@ -65,5 +65,6 @@ class Lee2021(BaseWrapper):
     def get_encoder(self, mode):
         if mode not in self.encoders:
             print("Model cache miss")
+            self.mode = mode
             self.encoders[mode] = torch.jit.load("./models/lee2021_layer_{}.ptl".format(self.mode))
         return self.encoders[mode]

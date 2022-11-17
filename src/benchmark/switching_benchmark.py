@@ -43,6 +43,8 @@ def benchmark_model_switching(wrapperClass: BaseWrapper, device, name):
             results[name+str(mode)] = {"disk_load": al, "timings": timings.tolist()}
             print("Model {}, mode {}".format(name, mode))
             print("Ram USE: {}".format(psutil.virtual_memory()[3] / 1e9))
+
+    del wrapper
     return results
 
 
