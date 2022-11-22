@@ -15,6 +15,7 @@ def get_argparser():
     argparser.add_argument('--seconds', type=int, default=100, help='Total Runtime')
     argparser.add_argument('--deadline', type=int, default=200, help='Frame Deadline')
     argparser.add_argument("--addr", required=True, type=str, help="If client, please specify target connection")
+    argparser.add_argument('--mode', type=int, default=-1, help='(11, 12, .. 44) or -1 (dynamic)')
     #argparser.add_argument('-multithread', type=str, default=10, help='separate compute/communicate threads')
     return argparser
 
@@ -60,7 +61,10 @@ def main():
 
         print("End-to-End Time:{} / Deadline: {} / BW:{}".format(e2e*1000, args.deadline, expected_bw))
 
-        mode = wrapper.get_best_mode(bw_moving_average, args.deadline)
+        if args.mode == -1:
+            mode = wrapper.get_best_mode(bw_moving_average, args.deadline)
+        else:
+            mode = args.mode
         model = wrapper.get_encoder(mode)
         mAP, kbs = wrapper.results[mode]
         print("Setting Mode/MaP: {}/{}".format(mode, mAP))
