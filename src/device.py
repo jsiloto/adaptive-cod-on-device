@@ -47,7 +47,7 @@ def main():
         expected_server_time = 0.060
         rtt_time -= expected_server_time
         bandwidth = kbs/rtt_time
-        alpha = 0.7
+        alpha = 0.4
         bw_moving_average = alpha*bandwidth + (1-alpha)*bw_moving_average
         e2e_end = time.time()
         e2e = e2e_end - e2e_start
@@ -66,7 +66,8 @@ def main():
             "map": mAP,
             "model_time": model_time,
             "kbs": kbs/1000,
-            "deadline": args.deadline
+            "deadline": args.deadline,
+            "time": time.time()
         }
 
         writer.write(results)

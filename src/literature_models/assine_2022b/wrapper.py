@@ -93,7 +93,7 @@ class Assine2022B(BaseWrapper):
         for mode, (map, kb) in self.results.items():
             compute_time = single_compute_time*(mode/10)
             transmit_time = kb/bandwidth
-            if compute_time+transmit_time < 0.9*deadline:
+            if compute_time+transmit_time < 0.8*deadline:
                 if map > best_map:
                     best = mode
                     best_map = map
