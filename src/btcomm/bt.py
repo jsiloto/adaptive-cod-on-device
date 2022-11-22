@@ -3,6 +3,7 @@
 import random
 import string
 import time
+import torch.multiprocessing as mp
 
 from bluetooth import *
 
@@ -70,7 +71,25 @@ class BTServer(object):
         self.port = self.server_sock.getsockname()[1]
         self.uuid = uuid
         self.callback = callback
+        self.p = None
+        self.client_sock = None
+        self.client_info = None
 
+
+    def compute_and_respond(self):
+        ################ Callback ##################
+        start = time.time()
+        self.callback()
+        end = time.time()
+        print("Callback Time", end - start)
+
+        ################ Send ##################
+        start = time.time()
+        t = ''.join(random.choices(string.ascii_uppercase +
+                                   string.digits, k=50)) + end_token
+        self.client_sock.send(t.encode())
+        end = time.time()
+        print("Send Time", end - start)
 
     def run(self):
         if self.callback is None:
@@ -82,10 +101,11 @@ class BTServer(object):
                                         # protocols=[bluetooth.OBEX_UUID]
                                         )
 
+        p = None
         print("Waiting for connection on RFCOMM channel", self.port)
         while (True):
-            client_sock, client_info = self.server_sock.accept()
-            print("Accepted connection from", client_info)
+            self.client_sock, self.client_info = self.server_sock.accept()
+            print("Accepted connection from", self.client_info)
 
             try:
                 total = 0
@@ -94,25 +114,16 @@ class BTServer(object):
                     start = time.time()
                     d = ""
                     while end_token not in d:
-                        d += client_sock.recv(2056).decode()
+                        d += self.client_sock.recv(2056).decode()
 
                     total += len(d)
                     end = time.time()
                     print("Recv Time", end - start)
 
-                    ################ Callback ##################
-                    start = time.time()
-                    self.callback()
-                    end = time.time()
-                    print("Callback Time", end - start)
+                    if self.p is not None:
+                        self.p.join()
+                    self.p = mp.Process(target=self.compute_and_respond)
 
-                    ################ Send ##################
-                    start = time.time()
-                    t = ''.join(random.choices(string.ascii_uppercase +
-                                               string.digits, k=50)) + end_token
-                    client_sock.send(t.encode())
-                    end = time.time()
-                    print("Send Time", end - start)
 
             except OSError:
                 pass
@@ -120,7 +131,7 @@ class BTServer(object):
                 exit()
 
             print("Disconnected.")
-            client_sock.close()
+            self.client_sock.close()
 
         self.server_sock.close()
         print("All done.")

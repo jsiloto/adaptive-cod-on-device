@@ -23,6 +23,7 @@ def main():
         if args.ideal:
             print("Ideal Server")
         else:
+
             dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
             model(dummy_input)
 

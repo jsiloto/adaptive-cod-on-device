@@ -66,7 +66,8 @@ def main():
             "mode": mode,
             "map": mAP,
             "model_time": model_time,
-            "kbs": kbs/1000
+            "kbs": kbs/1000,
+            "deadline": args.deadline
         }
 
         writer.write(results)
