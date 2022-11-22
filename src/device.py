@@ -36,6 +36,9 @@ def main():
     start = time.time()
     bw_moving_average = 200
     writer = jsonlines.open('output.jsonl', mode='w')
+    error = 0.0
+    previous_error = 0.0
+    target = args.deadline
     while time.time() - start < args.seconds:
         e2e_start = time.time()
         dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
@@ -48,10 +51,14 @@ def main():
         rtt_time -= expected_server_time
         bandwidth = kbs/rtt_time
         alpha = 0.4
-        bw_moving_average = alpha*bandwidth + (1-alpha)*bw_moving_average
+        last_bw = bw_moving_average
+        bw_moving_average = alpha*bandwidth + (1-alpha)*last_bw
         e2e_end = time.time()
         e2e = e2e_end - e2e_start
-        print("End-to-End Time:{} / Deadline: {} / BW:{}".format(e2e*1000, args.deadline, bw_moving_average))
+        expected_bw = bw_moving_average + (bw_moving_average - last_bw)/4
+
+
+        print("End-to-End Time:{} / Deadline: {} / BW:{}".format(e2e*1000, args.deadline, expected_bw))
 
         mode = wrapper.get_best_mode(bw_moving_average, args.deadline)
         model = wrapper.get_encoder(mode)
