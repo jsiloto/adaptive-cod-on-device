@@ -14,7 +14,6 @@ def get_argparser():
     argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
     argparser.add_argument('--seconds', type=int, default=100, help='Total Runtime')
     argparser.add_argument('--deadline', type=int, default=200, help='Frame Deadline')
-    # argparser.add_argument('--mode', type=str, default=10, help='Mode of operation (11 12 .. 44) or dynamic')
     argparser.add_argument("--addr", required=True, type=str, help="If client, please specify target connection")
     #argparser.add_argument('-multithread', type=str, default=10, help='separate compute/communicate threads')
     return argparser

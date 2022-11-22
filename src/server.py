@@ -1,7 +1,6 @@
 import argparse
 
 import torch
-
 from btcomm.bt import BTServer
 from literature_models.assine_2022b.decoder import get_decoder
 
@@ -19,6 +18,8 @@ def main():
     model = get_decoder()
     model.to(device)
     input_shape = (1, 6, 96, 96)
+    dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
+    model(dummy_input)
     def callback():
         if args.ideal:
             print("Ideal Server")
