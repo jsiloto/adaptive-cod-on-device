@@ -24,10 +24,12 @@ def main():
         if args.ideal:
             print("Ideal Server")
         else:
-
-            dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
+            starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+            starter.record()
             model(dummy_input)
-
+            ender.record()
+            # WAIT FOR GPU SYNC
+            torch.cuda.synchronize()
 
     # set up server
     bt_server = BTServer(callback=callback)

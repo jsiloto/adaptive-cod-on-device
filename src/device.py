@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import shutil
 import time
@@ -36,7 +37,7 @@ def main():
     bt_client = BTClient(args.addr)
     start = time.time()
     bw_moving_average = 200
-    writer = jsonlines.open('output.jsonl', mode='w')
+    writer = jsonlines.open(f'output_{args.name}.jsonl', mode='w')
     error = 0.0
     previous_error = 0.0
     target = args.deadline
@@ -47,7 +48,8 @@ def main():
         model_time = time.time()-e2e_start
         print("Model time", model_time)
         kbs = wrapper.get_reported_results(mode)[1]/1000.0
-        rtt_time = bt_client.send(kbs)
+        rtt_time, data = bt_client.send(kbs)
+        data = json.loads(data)
         expected_server_time = 0.060
         rtt_time -= expected_server_time
         bandwidth = kbs/rtt_time
@@ -80,6 +82,7 @@ def main():
             "deadline": args.deadline,
             "time": time.time()
         }
+        results.update(data)
 
         writer.write(results)
 

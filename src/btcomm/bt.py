@@ -1,5 +1,6 @@
 # Bits and pieces copied from
 # https://github.com/pybluez/pybluez/blob/master/examples/simple/
+import json
 import random
 import string
 import time
@@ -55,12 +56,14 @@ class BTClient(object):
             self.sock.send(tt)
         self.sock.send(end_token.encode())
 
-        d = ""
-        while end_token not in d:
-            d += self.sock.recv(96).decode()
+        data = ""
+        while end_token not in data:
+            data += self.sock.recv(96).decode()
+
+        data = data.split(end_token)[0]
         end = time.time()
         rtt_time = end - start
-        return rtt_time
+        return rtt_time, data
 
 class BTServer(object):
 
@@ -92,6 +95,8 @@ class BTServer(object):
             try:
                 total = 0
                 while True:
+                    response = {
+                    }
                     ################ Recv ##################
                     start = time.time()
                     d = ""
@@ -100,18 +105,21 @@ class BTServer(object):
 
                     total += len(d)
                     end = time.time()
-                    print("Recv Time", end - start)
+                    response["rec_time"] = round((end - start)*1000, 1)
+                    print("Recv Time", response["rec_time"] )
 
                     ################ Callback ##################
                     start = time.time()
                     self.callback()
                     end = time.time()
-                    print("Callback Time", end - start)
+                    response["decoder_time"] = round((end - start)*1000, 1)
+                    print("Callback Time", response["decoder_time"])
 
                     ################ Send ##################
                     start = time.time()
-                    t = ''.join(random.choices(string.ascii_uppercase +
-                                               string.digits, k=50)) + end_token
+                    t = json.dumps(response) + end_token
+                    # t = ''.join(random.choices(string.ascii_uppercase +
+                    #                            string.digits, k=50)) + end_token
                     client_sock.send(t.encode())
                     end = time.time()
                     print("Send Time", end - start)
