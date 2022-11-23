@@ -53,7 +53,7 @@ def main():
     # Generate all model
     build_all_jit_models()
 
-    for name, wrapper_class, mode in get_all_options(dummy=False):
+    for name, wrapper_class, mode in get_all_options(dummy=False, reduced=(not args.full)):
         wrapper = wrapper_class(mode=mode)
         name = name + "_" + str(mode)
         model = wrapper.get_encoder(mode)

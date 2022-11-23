@@ -65,8 +65,13 @@ class Matsubara2022(BaseWrapper):
         return results[mode]
 
     def get_encoder(self, mode):
+        self.mode = mode
         if mode not in self.encoders:
             print("Model cache miss")
-            self.mode = mode
-            self.encoders[mode] = torch.jit.load("./models/matsubara2022_{}.ptl".format(mode))
+            model_file = f"./models/matsubara2022_{mode}.ptl"
+            if not os.path.isfile(model_file):
+                print("Model file miss")
+                self.generate_torchscript("./models/")
+
+            self.encoders[mode] = torch.jit.load(model_file)
         return self.encoders[mode]

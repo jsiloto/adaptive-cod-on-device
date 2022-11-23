@@ -20,6 +20,7 @@ def read_jsonlines_file(filename):
     results["mode"] = get_values("mode")
     results["compute"] = [m // 10 for m in results["mode"]]
     results["bits"] = [m % 10 for m in results["mode"]]
+    # results['communication'] = get_values('rec_time')
 
     return results
 
@@ -27,6 +28,8 @@ def read_jsonlines_file(filename):
 def average_results(results):
     new_results = {}
     for key, values in results.items():
-        new_results[key] = np.average(values)
+        new_results[key] = round(np.average(values), 1)
+
+    new_results["mode"] = int(new_results["mode"])
 
     return new_results
