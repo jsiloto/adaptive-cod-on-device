@@ -13,7 +13,7 @@ class Assine2022B(BaseWrapper):
     def get_mode_options(cls, reduced=False):
         # Ensemblesize/numbits
         if reduced:
-            return [14, 24, 34, 44]
+            return [11, 22, 33, 44]
         else:
             return [11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44]
         # return [14, 24, 34, 44]

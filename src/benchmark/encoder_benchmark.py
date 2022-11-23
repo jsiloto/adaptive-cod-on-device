@@ -15,6 +15,7 @@ def get_argparser():
     argparser = argparse.ArgumentParser(description='On Device Experiments')
     argparser.add_argument('--cpus', type=int, required=True, help='Number of cpus')
     argparser.add_argument('--name', type=str, default="Test", help='Experiment Name')
+    argparser.add_argument('-full', action="store_true", help='Run all modes')
     return argparser
 
 args = get_argparser().parse_args()
