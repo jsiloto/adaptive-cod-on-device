@@ -38,15 +38,16 @@ def main():
     start = time.time()
     bw_moving_average = 200
     writer = jsonlines.open(f'output_{args.name}.jsonl', mode='w')
-    error = 0.0
-    previous_error = 0.0
-    target = args.deadline
+
     while time.time() - start < args.seconds:
+
+        ############ Run Encoder ################
         e2e_start = time.time()
         dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
         model(dummy_input)
-        model_time = time.time()-e2e_start
-        print("Model time", model_time)
+        model_time = round((time.time()-e2e_start)*1000, 1)
+
+        ############# Send/Recv ################
         kbs = wrapper.get_reported_results(mode)[1]/1000.0
         rtt_time, data = bt_client.send(kbs)
         data = json.loads(data)
@@ -56,19 +57,18 @@ def main():
         alpha = 0.4
         last_bw = bw_moving_average
         bw_moving_average = alpha*bandwidth + (1-alpha)*last_bw
-        e2e_end = time.time()
-        e2e = e2e_end - e2e_start
+        e2e = round((time.time()-e2e_start)*1000, 1)
         expected_bw = bw_moving_average + (bw_moving_average - last_bw)/4
 
-
-        print("End-to-End Time:{} / Deadline: {} / BW:{}".format(e2e*1000, args.deadline, expected_bw))
-
+        ############ Set next Mode ########################
         if args.mode == -1:
             mode = wrapper.get_best_mode(bw_moving_average, args.deadline)
         else:
             mode = args.mode
         model = wrapper.get_encoder(mode)
         mAP, kbs = wrapper.results[mode]
+
+        print(f"E2E:{e2e} / Model:{model_time} / Deadline: {args.deadline} / BW:{expected_bw}")
         print("Setting Mode/MaP: {}/{}".format(mode, mAP))
 
 

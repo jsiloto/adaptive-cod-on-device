@@ -102,18 +102,15 @@ class BTServer(object):
                     d = ""
                     while end_token not in d:
                         d += client_sock.recv(2056).decode()
-
                     total += len(d)
                     end = time.time()
                     response["rec_time"] = round((end - start)*1000, 1)
-                    print("Recv Time", response["rec_time"] )
 
                     ################ Callback ##################
                     start = time.time()
                     self.callback()
                     end = time.time()
                     response["decoder_time"] = round((end - start)*1000, 1)
-                    print("Callback Time", response["decoder_time"])
 
                     ################ Send ##################
                     start = time.time()
@@ -122,7 +119,11 @@ class BTServer(object):
                     #                            string.digits, k=50)) + end_token
                     client_sock.send(t.encode())
                     end = time.time()
-                    print("Send Time", end - start)
+
+                    #################### LOG ##################
+                    print("Recv Time", response["rec_time"] )
+                    print("Callback Time", response["decoder_time"])
+                    print("Send Time", round((end - start)*1000, 1))
 
             except OSError:
                 pass
