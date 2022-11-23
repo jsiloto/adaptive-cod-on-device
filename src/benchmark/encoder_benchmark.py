@@ -31,8 +31,8 @@ from literature_models.model_wrapper import get_all_options, eval_single_model, 
 
 
 def benchmark_model_inference(model, input_shape, device):
-    warmup_times = 50
-    experiment_times = 50
+    warmup_times = 10
+    experiment_times = 10
     model.to(device)
 
     # INIT LOGGERS
