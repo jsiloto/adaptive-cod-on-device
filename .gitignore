@@ -1,3 +1,5 @@
+rsync_code.sh
+results/*.pdf
 src/models/
 adaptive-cod/
 .idea/
