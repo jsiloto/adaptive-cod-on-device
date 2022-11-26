@@ -42,22 +42,22 @@ def main():
     while time.time() - start < args.seconds:
 
         ############ Run Encoder ################
-        e2e_start = time.time()
+        e2e_start = time.time()*1000
         dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)
         model(dummy_input)
-        model_time = round((time.time()-e2e_start)*1000, 1)
+        encoder_time = time.time()*1000-e2e_start
 
         ############# Send/Recv ################
         kbs = wrapper.get_reported_results(mode)[1]/1000.0
-        rtt_time, data = bt_client.send(kbs)
+        data = bt_client.send(kbs)
         data = json.loads(data)
-        expected_server_time = 0.060
-        rtt_time -= expected_server_time
-        bandwidth = kbs/rtt_time
+        decoder_time = data["decoder_time"]
+        e2e = time.time() * 1000 - e2e_start
+        transfer_time = e2e - decoder_time - encoder_time
+        bandwidth = 1000*kbs/transfer_time
         alpha = 0.4
         last_bw = bw_moving_average
         bw_moving_average = alpha*bandwidth + (1-alpha)*last_bw
-        e2e = round((time.time()-e2e_start)*1000, 1)
         expected_bw = bw_moving_average + (bw_moving_average - last_bw)/4
 
         ############ Set next Mode ########################
@@ -68,19 +68,21 @@ def main():
         model = wrapper.get_encoder(mode)
         mAP, kbs = wrapper.results[mode]
 
-        print(f"E2E:{e2e} / Model:{model_time} / Deadline: {args.deadline} / BW:{expected_bw}")
+        print(f"E2E:{e2e:.1f} / Transfer:{transfer_time:.1f} / Encoder:{encoder_time:.1f} / Decoder:{decoder_time:.1f}\n"
+              f"/ Deadline: {args.deadline} / BW:{expected_bw:.1f}")
         print("Setting Mode/MaP: {}/{}".format(mode, mAP))
 
 
         results ={
             "bw": bw_moving_average,
-            "e2e": 1000*e2e,
+            "e2e": e2e,
             "mode": mode,
             "map": mAP,
-            "model_time": model_time,
-            "kbs": kbs/1000,
+            "encoder_time": encoder_time,
+            "kbs": kbs,
             "deadline": args.deadline,
-            "time": time.time()
+            "time": time.time(),
+            "transfer_time": transfer_time
         }
         results.update(data)
 

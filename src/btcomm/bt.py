@@ -51,7 +51,6 @@ class BTClient(object):
                                    string.digits, k=chunk))
         tt = t.encode()
 
-        start = time.time()
         for i in range(num_chunks):
             self.sock.send(tt)
         self.sock.send(end_token.encode())
@@ -62,8 +61,7 @@ class BTClient(object):
 
         data = data.split(end_token)[0]
         end = time.time()
-        rtt_time = end - start
-        return rtt_time, data
+        return data
 
 class BTServer(object):
 
