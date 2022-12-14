@@ -42,10 +42,15 @@ class Assine2022A(BaseWrapper):
                                            print_per_layer_stat=False,
                                            as_strings=False,
                                            custom_modules_hooks=custom_module_mapping)
-        print(result)
+
+        a = 0
+        for m in self.encoder.modules():
+            if hasattr(m, "slimmable_params"):
+                a += m.slimmable_params
+
         dict = {'model': self.get_printname(),
                 'macs': result[0],
-                'params': result[1]}
+                'params': a+result[1]-173088}
         reported_results = self.get_reported_results(self.mode)
         dict['map'] = reported_results[0]
         dict['bw'] = reported_results[1]

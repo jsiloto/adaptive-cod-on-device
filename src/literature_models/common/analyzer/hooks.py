@@ -9,6 +9,8 @@ def bn_flops_counter_hook(module, input, output):
         batch_flops *= 2
     module.__flops__ += int(batch_flops)
 
+    module.__flops__ *= module.width_mult
+    module.slimmable_params = module.__params__ * module.width_mult
 
 def usconv_flops_counter_hook(conv_module, input, output):
     # Can have multiple inputs, getting the first one
@@ -48,6 +50,9 @@ def usconv_flops_counter_hook(conv_module, input, output):
     # conv_module.conv.__flops_handle__.remove()
     if hasattr(conv_module, 'conv'):
         conv_module.conv.register_forward_hook(empty_flops_counter_hook)
+
+    # Hack number of parameters to be slimmable
+    conv_module.slimmable_params = conv_per_position_flops
 
 
 # BoilerPlate

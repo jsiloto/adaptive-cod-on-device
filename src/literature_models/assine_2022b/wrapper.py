@@ -72,7 +72,8 @@ class Assine2022B(BaseWrapper):
         result = get_model_complexity_info(self.encoder, self.get_input_shape(),
                                            print_per_layer_stat=False,
                                            as_strings=False)
-        print(result)
+
+
         dict = {'model': self.get_printname(),
                 'macs': result[0],
                 'params': result[1]}
