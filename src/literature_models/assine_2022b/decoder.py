@@ -22,7 +22,7 @@ def sha1_checksum(filepath):
     return sha1.hexdigest()
 
 
-def get_decoder(map_location=torch.device('gpu')):
+def get_decoder(device=None):
     model_filepath = "./models/effd2_decoder.pt"
     sha1sum = "12e0c79f444b78dd38f5ba2bff4cd5062f0b4ccb"
     if not os.path.isfile(model_filepath):
@@ -33,6 +33,5 @@ def get_decoder(map_location=torch.device('gpu')):
         os.remove(model_filepath)
         print("Download Failed")
         exit(1)
-
-    model = torch.jit.load(model_filepath, map_location=map_location)
+    model = torch.jit.load(model_filepath, map_location=device)
     return model
