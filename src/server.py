@@ -15,7 +15,7 @@ def main():
     args = get_argparser().parse_args()
     device = "cuda"
     device = torch.device(device)
-    model = get_decoder()
+    model = get_decoder(map_location=device)
     model.to(device)
     input_shape = (1, 6, 96, 96)
     dummy_input = torch.randn(input_shape, dtype=torch.float).to(device)

@@ -38,6 +38,9 @@ def read_jsonlines_file(filename):
     results["bw"] = get_values("bw")
     results["e2e"] = get_values("e2e")
     results["mAP"] = get_values("map")
+    results["encoder_time"] = get_values("encoder_time")
+    results["decoder_time"] = get_values("decoder_time")
+    results["transfer_time"] = get_values("transfer_time")
     results["deadline"] = get_values("deadline")
     time = get_values("time")
     results["time"] = [t - time[0] for t in time]
