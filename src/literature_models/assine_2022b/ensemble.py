@@ -25,12 +25,12 @@ class Ensemble(nn.Module):
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):
-        y = self.models[0].forward(x)
-        for i, m in enumerate(self.models[1:]):
-            if i < self.size-1:
-                y_ = m.forward(x)
-                y_ = y_ * (2 ** (1 - i))
-                y = y + y_
+
+        a = [torch.jit.fork(m, x) for m in self.models]
+        outs = [b.wait() for b in a]
+        y = outs[0]
+        for i, o in enumerate(outs[1:]):
+            y = y + o * (2 ** (-i))
 
         # y = torch.sum(torch.stack(output_list), dim=0)
         return y

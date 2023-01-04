@@ -47,8 +47,8 @@ def main():
     df = pd.DataFrame(columns=['model', 'ms', 'KB', 'mAP'])
     device = "cpu"
     device = torch.device(device)
-    torch.set_num_interop_threads(1)
-    torch.set_num_threads(args.cpus)
+    torch.set_num_interop_threads(args.cpus)
+    torch.set_num_threads(1)
 
     # Generate all model
     build_all_jit_models()

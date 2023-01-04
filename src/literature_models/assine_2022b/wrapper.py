@@ -64,7 +64,7 @@ class Assine2022B(BaseWrapper):
         scripted.eval()
         output_name = "assine2022b.ptl".format(self.get_printname())
         out_file = os.path.join(out_dir, output_name)
-        scripted._save_for_lite_interpreter(out_file)
+        scripted.save(out_file)
         return out_file
 
     def generate_metrics(self):
