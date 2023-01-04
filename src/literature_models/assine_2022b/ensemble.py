@@ -8,7 +8,7 @@ from literature_models.common.efficientdet.preprocess import preprocess_for_torc
 class Ensemble(nn.Module):
     def __init__(self, encoder_builder, mode):
         super().__init__()
-        self.size: int = mode // 10
+        self.size: int = 4
         self.scale_factor: float = 0.5
 
         # print("Building Ensemble of size {}, scale factor {}"
@@ -25,8 +25,14 @@ class Ensemble(nn.Module):
         # print("Setting size: {}".format(self.size))
 
     def forward(self, x):
+        a = [torch.jit.fork(self.models[0], x)]
+        if self.size >=1:
+            a.append(torch.jit.fork(self.models[1], x))
+        if self.size >=2:
+            a.append(torch.jit.fork(self.models[2], x))
+        if self.size >=3:
+            a.append(torch.jit.fork(self.models[3], x))
 
-        a = [torch.jit.fork(m, x) for m in self.models]
         outs = [b.wait() for b in a]
         y = outs[0]
         for i, o in enumerate(outs[1:]):
