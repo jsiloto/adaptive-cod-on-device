@@ -82,7 +82,7 @@ class Assine2022B(BaseWrapper):
         return self.results[mode]
 
     def get_best_mode(self, bandwidth, deadline):
-        single_compute_time=60.0 #ms
+        single_compute_time=100.0 #ms
 
         best = (1, 1.0)
         best_map = 14.5
