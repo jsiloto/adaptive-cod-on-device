@@ -78,7 +78,7 @@ class Assine2022B(BaseWrapper):
         return dict
 
     def get_reported_results(self, mode: Tuple[int, float]) -> (float, float):
-        assert mode in self.get_mode_options()
+        # assert mode in self.get_mode_options()
         return self.results[mode]
 
     def get_best_mode(self, bandwidth, deadline):
