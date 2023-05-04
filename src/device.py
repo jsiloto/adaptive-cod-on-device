@@ -23,7 +23,7 @@ def get_argparser():
 def main():
     # Load Model
     args = get_argparser().parse_args()
-    mode = 11
+    mode = (1, 1.0)
     wrapper = Assine2022B()
     model = wrapper.get_encoder(mode, force=True)
     input_shape = wrapper.get_input_shape(unsqueeze=True)

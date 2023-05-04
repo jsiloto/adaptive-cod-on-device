@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 import numpy as np
 import torch
@@ -25,7 +26,7 @@ class Assine2022B(BaseWrapper):
 
     def __init__(self, mode=None):
         if mode is None:
-            mode = 44
+            mode = (4, 4.0)
         self.mode = mode
         encoder_builder = Assine2022BEncoder
         self.encoder = Ensemble(encoder_builder, mode)
@@ -76,14 +77,14 @@ class Assine2022B(BaseWrapper):
         dict['bw'] = reported_results[1]
         return dict
 
-    def get_reported_results(self, mode: int) -> (float, float):
+    def get_reported_results(self, mode: List[int, float]) -> (float, float):
         assert mode in self.get_mode_options()
         return self.results[mode]
 
     def get_best_mode(self, bandwidth, deadline):
         single_compute_time=60.0 #ms
 
-        best = 11
+        best = (1, 1.0)
         best_map = 14.5
         for mode, (map, kb) in self.results.items():
             compute_time = single_compute_time*(mode/10)
@@ -106,5 +107,5 @@ class Assine2022B(BaseWrapper):
                 self.generate_torchscript("./models/")
             self.jit_encoder = torch.jit.load("./models/assine2022b.ptl")
 
-        self.jit_encoder.set_mode(mode)
+        self.jit_encoder.set_mode(10*mode[0])
         return self.jit_encoder
