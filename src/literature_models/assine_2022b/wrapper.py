@@ -29,7 +29,7 @@ class Assine2022B(BaseWrapper):
             mode = (4, 4.0)
         self.mode = mode
         encoder_builder = Assine2022BEncoder
-        self.encoder = Ensemble(encoder_builder, mode)
+        self.encoder = Ensemble(encoder_builder, mode[0]*10+1)
         self.jit_encoder = None
         p1 = np.poly1d([-1.97529218, 14.93673171, 3.58359398])
         p2 = np.poly1d([-1.87529218, 14.93673171, 3.58359398])
