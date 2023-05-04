@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import torch
 from ptflops import get_model_complexity_info
 
@@ -28,27 +30,19 @@ class Assine2022B(BaseWrapper):
         encoder_builder = Assine2022BEncoder
         self.encoder = Ensemble(encoder_builder, mode)
         self.jit_encoder = None
-        self.results = {
-            11: (14.5, 6912.0),
-            12: (27.7, 13824.0),
-            13: (32.0, 20736.0),
-            14: (34.3, 27648.0),
+        p1 = np.poly1d([-1.67529218, 14.93673171, 3.58359398])
+        p2 = np.poly1d([-1.77529218, 14.93673171, 3.58359398])
+        p3 = np.poly1d([-1.87529218, 14.93673171, 3.58359398])
+        p4 = np.poly1d([-1.97529218, 14.93673171, 3.58359398])
 
-            21: (16.5, 6912.0),
-            22: (29.4, 13824.0),
-            23: (34.1, 20736.0),
-            24: (36.1, 27648.0),
+        self.results = {}
+        for x in np.arange(1.0, 4.1, 0.1):
+            self.results[(1, x)] = (p1(x), 6912.0*x)
+            self.results[(2, x)] = (p2(x), 6912.0 * x)
+            self.results[(3, x)] = (p3(x), 6912.0 * x)
+            self.results[(4, x)] = (p4(x), 6912.0 * x)
 
-            31: (16.4, 6912.0),
-            32: (29.4, 13824.0),
-            33: (34.2, 20736.0),
-            34: (36.4, 27648.0),
-
-            41: (16.6, 6912.0),
-            42: (29.7, 13824.0),
-            43: (34.6, 20736.0),
-            44: (36.8, 27648.0),
-        }
+        print(self.results)
 
     def get_printname(self):
         return "assine2022b_{}".format(self.mode)
