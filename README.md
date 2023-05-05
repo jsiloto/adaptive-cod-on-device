@@ -3,8 +3,8 @@
 
 
 ```bash
-mkdir workspace
-cd workspace
-git clone https://github.com/jsiloto/adaptive-cod-on-device.git
-cd adaptive-cod-on-device
+sudo apt-get update
+sudo apt-get install -y git vim
+./environment.txt
+python src/device.py --addr 5C:F3:70:A9:76:D4
 ```
