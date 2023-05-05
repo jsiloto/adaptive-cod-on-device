@@ -45,8 +45,8 @@ def read_jsonlines_file(filename):
     time = get_values("time")
     results["time"] = [t - time[0] for t in time]
     results["mode"] = get_values("mode")
-    results["compute"] = [int(m // 10) for m in results["mode"]]
-    results["bits"] = [int(m % 10) for m in results["mode"]]
+    results["compute"] = [int(m[0]) for m in results["mode"]]
+    results["bits"] = [m[1] for m in results["mode"]]
     # results['communication'] = get_values('rec_time')
 
     return results
