@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 
-def read_sota():
+def read_sota_old():
     df = pd.read_csv("rpi4_cpus4.csv")
 
     df['KB'] = df['KB'].div(1000).round(1)
@@ -25,7 +25,7 @@ def read_sota():
     return df
 
 
-def read_jsonlines_file(filename):
+def read_jsonlines_file_old(filename):
     ignore_start = 5
 
     def get_values(key):
@@ -49,7 +49,7 @@ def read_jsonlines_file(filename):
     return results
 
 
-def average_results(results):
+def average_results_old(results):
     new_results = {}
     for key, values in results.items():
         new_results[key] = round(np.average(values), 1)
